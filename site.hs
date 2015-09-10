@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE LambdaCase #-}
 
 import Data.Monoid ((<>), mappend)
 import GHC.IO.Encoding
@@ -45,8 +46,9 @@ main = do
           }
         else myConf
       compileContents tpl ctx compiler = do
-        let indexRoute = customRoute $ \ident ->
-              (dropExtension $ toFilePath ident) ++ "/index.html"
+        let indexRoute = customRoute $ \case
+              "404.html" -> "404.html"
+              ident      -> (dropExtension $ toFilePath ident) ++ "/index.html"
             ctx' = ctx <> liveEditJSField "live_edit_js" watch
 
         route   $ baseRoute `composeRoutes` indexRoute
