@@ -1,0 +1,7 @@
+$ echo foobar > /tmp/foo
+$ ./slimming /tmp/foo /tmp/bar
+Done!
+$ phd /tmp/bar
+00000000  30 6f 70 73  a9 43 c4 46  f3 30 d0 50  cc 33 fe 35  │0ops│·C·F│·0·P│·3·5│
+00000010  c1 31                                               │·1│
+00000012

@@ -1,0 +1,5 @@
+for n in range(1, 10):
+    s = 'A' * n
+    t = blackbox(s)
+    print s
+    print hexdump(t)

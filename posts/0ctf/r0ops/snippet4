@@ -1,0 +1,64 @@
+    rcx <- 8
+    r9  <- 0x1337deadbeef0095
+START:
+    rax <- get_next_input_qword
+    r8  <- rax
+
+    rax <- r9
+    rbx <- 0xcafe
+    rax <- rax * rbx
+    r9  <- rax
+
+    rax <- r9
+    rbx <- 0xbeef
+    rax <- rax + rbx
+    r9  <- rax
+
+    r12 <- 1
+    r10 <- 0x3419
+
+    rax <- 0
+    rbx <- 0
+    goto LBL3 if rax == rbx
+
+LBL1:
+    r11 <- r10
+
+    rax <- r11
+    rbx <- 1
+    rax <- rax & rbx
+    r11 <- rax
+
+    rax <- r11
+    rbx <- 1
+    goto LBL2 if rax <> rbx
+
+    rax <- r12
+    rbx <- r8
+    rax <- rax * rbx
+    r12 <- rax
+
+LBL2:
+    rax <- r8
+    rbx <- r8
+    rax <- rax * rbx
+    r8  <- rax
+
+    rax <- r10
+    rax <- rax >> 1
+    r10 <- rax
+
+LBL3:
+    rax <- r10
+    rbx <- 0
+    goto LBL1 if rax <> rbx
+
+    rax <- r12
+    rbx <- r9
+    goto EXIT if rax <> rbx
+
+    loop START
+WIN:
+    ...
+EXIT:
+    ...

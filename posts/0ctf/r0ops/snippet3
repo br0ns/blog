@@ -1,0 +1,157 @@
+    pop     rcx ;; = 0x8
+    pop     r9  ;; = 0x1337deadbeef0095
+
+    mov     rax, [rdi]
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r8, [rsi]
+    sub     rsi, 8
+
+    add     rdi, 8
+
+    add     rsi, 8
+    mov     [rsi], r9
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    pop     rbx ;; = 0xcafe
+    imul    rax, rbx
+
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r9, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r9
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    pop     rbx ;; = 0xbeef
+    add     rax, rbx
+
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r9, [rsi]
+    sub     rsi, 8
+
+    pop     r12 ;; = 0x1
+    pop     r10 ;; = 0x3419
+    pop     rax ;; = 0x0
+    pop     rbx ;; = 0x0
+
+    pop     rdx ;; = 0x1d8
+    cmp     rax, rbx
+    jnz     short near ptr unk_DEAD1A7
+    add     rsp, rdx
+
+    add     rsi, 8
+    mov     [rsi], r10
+    mov     r11, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r11
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    pop     rbx ;; = 0x1
+    and     rax, rbx
+
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r11, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r11
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    pop     rbx ;; = 0x1
+
+    pop     rdx ;; = 0x68
+    cmp     rax, rbx
+    jz      short near ptr unk_DEAD1B6
+    add     rsp, rdx
+
+    add     rsi, 8
+    mov     [rsi], r12
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r8
+    mov     rbx, [rsi]
+    sub     rsi, 8
+
+    imul    rax, rbx
+
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r12, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r8
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r8
+    mov     rbx, [rsi]
+    sub     rsi, 8
+
+    imul    rax, rbx
+
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r8, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r10
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    shr     rax, 1
+
+    add     rsi, 8
+    mov     [rsi], rax
+    mov     r10, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r10
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    pop     rbx ;; = 0x0
+    pop     rdx ;; = 0xfffffffffffffde0
+
+    cmp     rax, rbx
+    jz      short locret_DEAD1B6
+    add     rsp, rdx
+
+    add     rsi, 8
+    mov     [rsi], r12
+    mov     rax, [rsi]
+    sub     rsi, 8
+
+    add     rsi, 8
+    mov     [rsi], r9
+    mov     rbx, [rsi]
+    sub     rsi, 8
+
+    pop     rdx ;; = 0x20
+
+    cmp     rax, rbx
+    jz      short locret_DEAD1B6
+    add     rsp, rdx
+
+    pop     rdx ;; = 0xfffffffffffffc38
+    loop    near ptr unk_DEAD1DB
+WIN:
+    ...
+EXIT:
+    ...

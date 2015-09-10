@@ -1,0 +1,698 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="description" content="Personal blog">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,index,follow">
+
+  <title>0ctf 2015: "r0ops" (Reverse 150) - br0ns</title>
+
+  <link href="http://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="../../../css/normalize.css">
+  <link rel="stylesheet" href="../../../css/noise.css">
+  <link rel="stylesheet" href="../../../css/style.css">
+
+  <!-- This is needed because Chrome gets the x-height wrong for the "Crimson
+    -- Text" font... no clue why
+    -->
+  <script type="text/javascript">
+    window.MathJax = {
+    "HTML-CSS": {minScaleAdjust: 100}
+    };
+  </script>
+
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script type="text/javascript" src="../../../js/highslide.js"></script>
+  <script type="text/javascript" src="../../../js/script.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  
+
+</head>
+
+<body>
+  <div id="header-container">
+<header>
+  <div id="header">
+    <div id="title">
+      <a href="../../../posts/0ctf/r0ops">
+        0ctf 2015: "r0ops" (Reverse 150)
+      </a>
+    </div>
+
+    
+
+    
+    <div id="meta">
+      <ul>
+        <li>
+          
+
+            
+          <i class="fa fa-calendar"></i>&nbsp;
+          September  6, 2015
+          
+        </li>
+
+        <li>
+          <i class="fa fa-code-fork"></i>&nbsp;
+          <a href="https://github.com/br0ns/blog/commit/6bf71246ce22e4a8034c1b0b8771cbe14c3acb22" title="View on GitHub">
+            6bf7124&hellip;
+          </a>
+        </li>
+
+        
+        <li>
+          <i class="fa fa-tags"></i>&nbsp;
+          <a href="../../../tags/writeups">Writeups</a>, <a href="../../../tags/ida-pro">IDA Pro</a>
+        </li>
+        
+
+      </ul>
+    </div>
+    
+
+  </div>
+
+  <div id="navbar-placeholder">
+
+    <div id="navbar">
+      <nav id="main-nav">
+        <ul>
+          <li>
+            <a href="../../../">
+              <i class="fa fa-lg fa-home"></i>
+            </a>
+          </li>
+
+          <li>
+            <a href="https://github.com/br0ns">
+              <i class="fa fa-lg fa-github"></i>
+            </a>
+          </li>
+
+          <li>
+            <a href="../../../about">About</a>
+          </li>
+
+          <li>
+            <a href="../../../tags/all">Archive</a>
+          </li>
+
+          <li>
+            <a id="search-link">Search</a>
+          </li>
+
+        </ul>
+      </nav>
+
+      <div id="search-form-container">
+        <form class="search" action="http://google.com/search" method="get">
+          <input id="input" type="text" results="0" placeholder autocomplete="off" spellcheck="false">
+        <input id="query" type="hidden" name="q" value>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+  </div>
+
+  <article id="content">
+    <blockquote>
+<p>allways <a href="../../../posts/0ctf/r0ops/r0ops" class="uri">r0ops</a></p>
+</blockquote>
+<p>This challenge was quite hard for the points given. Anyway, the “reversing” is easy enough.</p>
+<p>First off the program accepts a network connection and reads up to 0x1000 bytes to a global buffer. Then it copies 0x1000 random looking bytes from one global buffer to another. I have no idea what this step is for; an attempt at obfuscation maybe?</p>
+<p>Lastly <code>rdi</code> is loaded with the address of the received data, <code>rsi</code> with the address of an uninitialized global buffer, and <code>rsp</code> with an address in the middle of the random looking bytes. Upon return from the program will then of course jump to the first address stored here.</p>
+<p>As it turns out that address contains a jump to a short code sequence which ends in a <code>ret</code>, which of course means that the program jumps to the next address in the “stack”:</p>
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet0" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span>0x0dead1f4: jmp     2 ;; 0x0dead1f8
+</span><span id="line-2"><span class="lineno">2 </span>0x0dead1f6: or      esi, esi ;; probably just for alignment
+</span><span id="line-3"><span class="lineno">3 </span>0x0dead1f8: pop     rcx
+</span><span id="line-4"><span class="lineno">4 </span>0x0dead1f8: retn
+</span></pre></div>
+</figure></div>
+<p>Looking at a few more gadgets on the “stack” I see the pattern that they all start with a short jump and end with a return.</p>
+<p>So I write an <a href="../../../posts/0ctf/r0ops/decode.py">IDA script</a> to extract the “real” program:</p>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/decode.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span><span class="kn">from</span> <span class="nn">idaapi</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="line-2"><span class="lineno"> 2 </span><span class="kn">from</span> <span class="nn">idautils</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="line-3"><span class="lineno"> 3 </span><span class="kn">from</span> <span class="nn">idc</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="line-4"><span class="lineno"> 4 </span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+</span><span id="line-5"><span class="lineno"> 5 </span>
+</span><span id="line-6"><span class="lineno"> 6 </span><span class="c"># IDA does something to fd 1 and 2</span>
+</span><span id="line-7"><span class="lineno"> 7 </span><span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span><span id="line-8"><span class="lineno"> 8 </span>    <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="s">'</span><span class="si">%s</span><span class="se">\n</span><span class="s">'</span> <span class="o">%</span> <span class="n">s</span><span class="p">)</span>
+</span><span id="line-9"><span class="lineno"> 9 </span>
+</span><span id="line-10"><span class="lineno">10 </span><span class="n">rsp</span> <span class="o">=</span> <span class="mh">0xe0b08a0</span>
+</span><span id="line-11"><span class="lineno">11 </span><span class="n">program</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-12"><span class="lineno">12 </span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+</span><span id="line-13"><span class="lineno">13 </span>    <span class="n">addr</span> <span class="o">=</span> <span class="n">Qword</span><span class="p">(</span><span class="n">rsp</span><span class="p">)</span>
+</span><span id="line-14"><span class="lineno">14 </span>    <span class="n">line</span> <span class="o">=</span> <span class="s">'0x</span><span class="si">%08x</span><span class="s"> -&gt; '</span> <span class="o">%</span> <span class="n">rsp</span>
+</span><span id="line-15"><span class="lineno">15 </span>    <span class="n">rsp</span> <span class="o">+=</span> <span class="mi">8</span>
+</span><span id="line-16"><span class="lineno">16 </span>    <span class="c"># Looks like all gadgets start on a jump</span>
+</span><span id="line-17"><span class="lineno">17 </span>    <span class="n">jmp</span> <span class="o">=</span> <span class="n">DecodeInstruction</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</span><span id="line-18"><span class="lineno">18 </span>    <span class="c"># Not a pointer: The &quot;stack&quot; is probably exhausted</span>
+</span><span id="line-19"><span class="lineno">19 </span>    <span class="k">if</span> <span class="n">jmp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+</span><span id="line-20"><span class="lineno">20 </span>        <span class="k">break</span>
+</span><span id="line-21"><span class="lineno">21 </span>    <span class="k">assert</span> <span class="n">jmp</span><span class="o">.</span><span class="n">get_canon_mnem</span><span class="p">()</span> <span class="o">==</span> <span class="s">'jmp'</span>
+</span><span id="line-22"><span class="lineno">22 </span>    <span class="n">addr</span> <span class="o">=</span> <span class="n">jmp</span><span class="o">.</span><span class="n">Op1</span><span class="o">.</span><span class="n">addr</span>
+</span><span id="line-23"><span class="lineno">23 </span>    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+</span><span id="line-24"><span class="lineno">24 </span>        <span class="n">size</span> <span class="o">=</span> <span class="n">MakeCode</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</span><span id="line-25"><span class="lineno">25 </span>        <span class="k">assert</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span id="line-26"><span class="lineno">26 </span>        <span class="n">mnem</span> <span class="o">=</span> <span class="n">GetMnem</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</span><span id="line-27"><span class="lineno">27 </span>        <span class="n">line</span> <span class="o">+=</span> <span class="s">'0x</span><span class="si">%08x</span><span class="s">: </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">GetDisasm</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+</span><span id="line-28"><span class="lineno">28 </span>        <span class="k">if</span>   <span class="n">mnem</span> <span class="o">==</span> <span class="s">'retn'</span><span class="p">:</span>
+</span><span id="line-29"><span class="lineno">29 </span>            <span class="k">break</span>
+</span><span id="line-30"><span class="lineno">30 </span>        <span class="k">elif</span> <span class="n">mnem</span> <span class="o">==</span> <span class="s">'pop'</span><span class="p">:</span>
+</span><span id="line-31"><span class="lineno">31 </span>            <span class="n">line</span> <span class="o">+=</span> <span class="s">' ;; </span><span class="si">%d</span><span class="s">'</span> <span class="o">%</span> <span class="n">Qword</span><span class="p">(</span><span class="n">rsp</span><span class="p">)</span>
+</span><span id="line-32"><span class="lineno">32 </span>            <span class="n">rsp</span> <span class="o">+=</span> <span class="mi">8</span>
+</span><span id="line-33"><span class="lineno">33 </span>        <span class="n">addr</span> <span class="o">+=</span> <span class="n">size</span>
+</span><span id="line-34"><span class="lineno">34 </span>        <span class="n">program</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</span><span id="line-35"><span class="lineno">35 </span>        <span class="n">line</span> <span class="o">=</span> <span class="s">' '</span> <span class="o">*</span> <span class="mi">14</span>
+</span><span id="line-36"><span class="lineno">36 </span>
+</span><span id="line-37"><span class="lineno">37 </span><span class="n">info</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">program</span><span class="p">))</span>
+</span><span id="line-38"><span class="lineno">38 </span>
+</span><span id="line-39"><span class="lineno">39 </span><span class="nb">exit</span><span class="p">()</span>
+</span></pre></div>
+</figure></div>
+<p>And run it:</p>
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet2" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">  1 </span>$ idaq64 -Sdecode.py -B r0ops 42&gt;&amp;1
+</span><span id="line-2"><span class="lineno">  2 </span>0x0e0b08a0 -&gt; 0x0dead1f8: pop     rcx ;; = 0x8
+</span><span id="line-3"><span class="lineno">  3 </span>0x0e0b08b0 -&gt; 0x0dead275: pop     r9 ;; = 0x1337deadbeef0095
+</span><span id="line-4"><span class="lineno">  4 </span>0x0e0b08c0 -&gt; 0x0dead127: mov     rax, [rdi]
+</span><span id="line-5"><span class="lineno">  5 </span>0x0e0b08c8 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-6"><span class="lineno">  6 </span>0x0e0b08d0 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-7"><span class="lineno">  7 </span>0x0e0b08d8 -&gt; 0x0dead26b: mov     r8, [rsi]
+</span><span id="line-8"><span class="lineno">  8 </span>0x0e0b08e0 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-9"><span class="lineno">  9 </span>0x0e0b08e8 -&gt; 0x0dead107: add     rdi, 8
+</span><span id="line-10"><span class="lineno"> 10 </span>0x0e0b08f0 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-11"><span class="lineno"> 11 </span>0x0e0b08f8 -&gt; 0x0dead27e: mov     [rsi], r9
+</span><span id="line-12"><span class="lineno"> 12 </span>0x0e0b0900 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-13"><span class="lineno"> 13 </span>0x0e0b0908 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-14"><span class="lineno"> 14 </span>0x0e0b0910 -&gt; 0x0dead1f0: pop     rbx ;; = 0xcafe
+</span><span id="line-15"><span class="lineno"> 15 </span>0x0e0b0920 -&gt; 0x0dead145: imul    rax, rbx
+</span><span id="line-16"><span class="lineno"> 16 </span>0x0e0b0928 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-17"><span class="lineno"> 17 </span>0x0e0b0930 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-18"><span class="lineno"> 18 </span>0x0e0b0938 -&gt; 0x0dead288: mov     r9, [rsi]
+</span><span id="line-19"><span class="lineno"> 19 </span>0x0e0b0940 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-20"><span class="lineno"> 20 </span>0x0e0b0948 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-21"><span class="lineno"> 21 </span>0x0e0b0950 -&gt; 0x0dead27e: mov     [rsi], r9
+</span><span id="line-22"><span class="lineno"> 22 </span>0x0e0b0958 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-23"><span class="lineno"> 23 </span>0x0e0b0960 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-24"><span class="lineno"> 24 </span>0x0e0b0968 -&gt; 0x0dead1f0: pop     rbx ;; = 0xbeef
+</span><span id="line-25"><span class="lineno"> 25 </span>0x0e0b0978 -&gt; 0x0dead131: add     rax, rbx
+</span><span id="line-26"><span class="lineno"> 26 </span>0x0e0b0980 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-27"><span class="lineno"> 27 </span>0x0e0b0988 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-28"><span class="lineno"> 28 </span>0x0e0b0990 -&gt; 0x0dead288: mov     r9, [rsi]
+</span><span id="line-29"><span class="lineno"> 29 </span>0x0e0b0998 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-30"><span class="lineno"> 30 </span>0x0e0b09a0 -&gt; 0x0dead2cc: pop     r12 ;; = 0x1
+</span><span id="line-31"><span class="lineno"> 31 </span>0x0e0b09b0 -&gt; 0x0dead292: pop     r10 ;; = 0x3419
+</span><span id="line-32"><span class="lineno"> 32 </span>0x0e0b09c0 -&gt; 0x0dead1e8: pop     rax ;; = 0x0
+</span><span id="line-33"><span class="lineno"> 33 </span>0x0e0b09d0 -&gt; 0x0dead1f0: pop     rbx ;; = 0x0
+</span><span id="line-34"><span class="lineno"> 34 </span>0x0e0b09e0 -&gt; 0x0dead200: pop     rdx ;; = 0x1d8
+</span><span id="line-35"><span class="lineno"> 35 </span>0x0e0b09f0 -&gt; 0x0dead19f: cmp     rax, rbx
+</span><span id="line-36"><span class="lineno"> 36 </span>              0x0dead1a2: jnz     short near ptr unk_DEAD1A7
+</span><span id="line-37"><span class="lineno"> 37 </span>              0x0dead1a4: add     rsp, rdx
+</span><span id="line-38"><span class="lineno"> 38 </span>0x0e0b09f8 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-39"><span class="lineno"> 39 </span>0x0e0b0a00 -&gt; 0x0dead29b: mov     [rsi], r10
+</span><span id="line-40"><span class="lineno"> 40 </span>0x0e0b0a08 -&gt; 0x0dead2c2: mov     r11, [rsi]
+</span><span id="line-41"><span class="lineno"> 41 </span>0x0e0b0a10 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-42"><span class="lineno"> 42 </span>0x0e0b0a18 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-43"><span class="lineno"> 43 </span>0x0e0b0a20 -&gt; 0x0dead2b8: mov     [rsi], r11
+</span><span id="line-44"><span class="lineno"> 44 </span>0x0e0b0a28 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-45"><span class="lineno"> 45 </span>0x0e0b0a30 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-46"><span class="lineno"> 46 </span>0x0e0b0a38 -&gt; 0x0dead1f0: pop     rbx ;; = 0x1
+</span><span id="line-47"><span class="lineno"> 47 </span>0x0e0b0a48 -&gt; 0x0dead177: and     rax, rbx
+</span><span id="line-48"><span class="lineno"> 48 </span>0x0e0b0a50 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-49"><span class="lineno"> 49 </span>0x0e0b0a58 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-50"><span class="lineno"> 50 </span>0x0e0b0a60 -&gt; 0x0dead2c2: mov     r11, [rsi]
+</span><span id="line-51"><span class="lineno"> 51 </span>0x0e0b0a68 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-52"><span class="lineno"> 52 </span>0x0e0b0a70 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-53"><span class="lineno"> 53 </span>0x0e0b0a78 -&gt; 0x0dead2b8: mov     [rsi], r11
+</span><span id="line-54"><span class="lineno"> 54 </span>0x0e0b0a80 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-55"><span class="lineno"> 55 </span>0x0e0b0a88 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-56"><span class="lineno"> 56 </span>0x0e0b0a90 -&gt; 0x0dead1f0: pop     rbx ;; = 0x1
+</span><span id="line-57"><span class="lineno"> 57 </span>0x0e0b0aa0 -&gt; 0x0dead200: pop     rdx ;; = 0x68
+</span><span id="line-58"><span class="lineno"> 58 </span>0x0e0b0ab0 -&gt; 0x0dead1ae: cmp     rax, rbx
+</span><span id="line-59"><span class="lineno"> 59 </span>              0x0dead1b1: jz      short near ptr unk_DEAD1B6
+</span><span id="line-60"><span class="lineno"> 60 </span>              0x0dead1b3: add     rsp, rdx
+</span><span id="line-61"><span class="lineno"> 61 </span>0x0e0b0ab8 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-62"><span class="lineno"> 62 </span>0x0e0b0ac0 -&gt; 0x0dead2d5: mov     [rsi], r12
+</span><span id="line-63"><span class="lineno"> 63 </span>0x0e0b0ac8 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-64"><span class="lineno"> 64 </span>0x0e0b0ad0 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-65"><span class="lineno"> 65 </span>0x0e0b0ad8 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-66"><span class="lineno"> 66 </span>0x0e0b0ae0 -&gt; 0x0dead261: mov     [rsi], r8
+</span><span id="line-67"><span class="lineno"> 67 </span>0x0e0b0ae8 -&gt; 0x0dead226: mov     rbx, [rsi]
+</span><span id="line-68"><span class="lineno"> 68 </span>0x0e0b0af0 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-69"><span class="lineno"> 69 </span>0x0e0b0af8 -&gt; 0x0dead145: imul    rax, rbx
+</span><span id="line-70"><span class="lineno"> 70 </span>0x0e0b0b00 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-71"><span class="lineno"> 71 </span>0x0e0b0b08 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-72"><span class="lineno"> 72 </span>0x0e0b0b10 -&gt; 0x0dead2df: mov     r12, [rsi]
+</span><span id="line-73"><span class="lineno"> 73 </span>0x0e0b0b18 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-74"><span class="lineno"> 74 </span>0x0e0b0b20 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-75"><span class="lineno"> 75 </span>0x0e0b0b28 -&gt; 0x0dead261: mov     [rsi], r8
+</span><span id="line-76"><span class="lineno"> 76 </span>0x0e0b0b30 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-77"><span class="lineno"> 77 </span>0x0e0b0b38 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-78"><span class="lineno"> 78 </span>0x0e0b0b40 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-79"><span class="lineno"> 79 </span>0x0e0b0b48 -&gt; 0x0dead261: mov     [rsi], r8
+</span><span id="line-80"><span class="lineno"> 80 </span>0x0e0b0b50 -&gt; 0x0dead226: mov     rbx, [rsi]
+</span><span id="line-81"><span class="lineno"> 81 </span>0x0e0b0b58 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-82"><span class="lineno"> 82 </span>0x0e0b0b60 -&gt; 0x0dead145: imul    rax, rbx
+</span><span id="line-83"><span class="lineno"> 83 </span>0x0e0b0b68 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-84"><span class="lineno"> 84 </span>0x0e0b0b70 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-85"><span class="lineno"> 85 </span>0x0e0b0b78 -&gt; 0x0dead26b: mov     r8, [rsi]
+</span><span id="line-86"><span class="lineno"> 86 </span>0x0e0b0b80 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-87"><span class="lineno"> 87 </span>0x0e0b0b88 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-88"><span class="lineno"> 88 </span>0x0e0b0b90 -&gt; 0x0dead29b: mov     [rsi], r10
+</span><span id="line-89"><span class="lineno"> 89 </span>0x0e0b0b98 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-90"><span class="lineno"> 90 </span>0x0e0b0ba0 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-91"><span class="lineno"> 91 </span>0x0e0b0ba8 -&gt; 0x0dead195: shr     rax, 1
+</span><span id="line-92"><span class="lineno"> 92 </span>0x0e0b0bb0 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-93"><span class="lineno"> 93 </span>0x0e0b0bb8 -&gt; 0x0dead208: mov     [rsi], rax
+</span><span id="line-94"><span class="lineno"> 94 </span>0x0e0b0bc0 -&gt; 0x0dead2a5: mov     r10, [rsi]
+</span><span id="line-95"><span class="lineno"> 95 </span>0x0e0b0bc8 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-96"><span class="lineno"> 96 </span>0x0e0b0bd0 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-97"><span class="lineno"> 97 </span>0x0e0b0bd8 -&gt; 0x0dead29b: mov     [rsi], r10
+</span><span id="line-98"><span class="lineno"> 98 </span>0x0e0b0be0 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-99"><span class="lineno"> 99 </span>0x0e0b0be8 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-100"><span class="lineno">100 </span>0x0e0b0bf0 -&gt; 0x0dead1f0: pop     rbx ;; = 0x0
+</span><span id="line-101"><span class="lineno">101 </span>0x0e0b0c00 -&gt; 0x0dead200: pop     rdx ;; = 0xfffffffffffffde0
+</span><span id="line-102"><span class="lineno">102 </span>0x0e0b0c10 -&gt; 0x0dead1ae: cmp     rax, rbx
+</span><span id="line-103"><span class="lineno">103 </span>              0x0dead1b1: jz      short locret_DEAD1B6
+</span><span id="line-104"><span class="lineno">104 </span>              0x0dead1b3: add     rsp, rdx
+</span><span id="line-105"><span class="lineno">105 </span>0x0e0b0c18 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-106"><span class="lineno">106 </span>0x0e0b0c20 -&gt; 0x0dead2d5: mov     [rsi], r12
+</span><span id="line-107"><span class="lineno">107 </span>0x0e0b0c28 -&gt; 0x0dead212: mov     rax, [rsi]
+</span><span id="line-108"><span class="lineno">108 </span>0x0e0b0c30 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-109"><span class="lineno">109 </span>0x0e0b0c38 -&gt; 0x0dead0f1: add     rsi, 8
+</span><span id="line-110"><span class="lineno">110 </span>0x0e0b0c40 -&gt; 0x0dead27e: mov     [rsi], r9
+</span><span id="line-111"><span class="lineno">111 </span>0x0e0b0c48 -&gt; 0x0dead226: mov     rbx, [rsi]
+</span><span id="line-112"><span class="lineno">112 </span>0x0e0b0c50 -&gt; 0x0dead0fc: sub     rsi, 8
+</span><span id="line-113"><span class="lineno">113 </span>0x0e0b0c58 -&gt; 0x0dead200: pop     rdx ;; = 0x20
+</span><span id="line-114"><span class="lineno">114 </span>0x0e0b0c68 -&gt; 0x0dead1ae: cmp     rax, rbx
+</span><span id="line-115"><span class="lineno">115 </span>              0x0dead1b1: jz      short locret_DEAD1B6
+</span><span id="line-116"><span class="lineno">116 </span>              0x0dead1b3: add     rsp, rdx
+</span><span id="line-117"><span class="lineno">117 </span>0x0e0b0c70 -&gt; 0x0dead200: pop     rdx ;; = 0xfffffffffffffc38
+</span><span id="line-118"><span class="lineno">118 </span>0x0e0b0c80 -&gt; 0x0dead1df: loop    near ptr unk_DEAD1DB
+</span><span id="line-119"><span class="lineno">119 </span>0x0e0b0c88 -&gt; 0x0dead340: sub     rsp, 10h
+</span><span id="line-120"><span class="lineno">120 </span>              0x0dead344: mov     edi, 0DEAD544h
+</span><span id="line-121"><span class="lineno">121 </span>              0x0dead349: call    near ptr _puts
+</span><span id="line-122"><span class="lineno">122 </span>              0x0dead34e: mov     edi, 0DEAD54Eh
+</span><span id="line-123"><span class="lineno">123 </span>              0x0dead353: mov     eax, 0
+</span><span id="line-124"><span class="lineno">124 </span>              0x0dead358: call    near ptr _printf
+</span><span id="line-125"><span class="lineno">125 </span>              0x0dead35d: mov     dword ptr [rbp-4], 0
+</span><span id="line-126"><span class="lineno">126 </span>              0x0dead364: jmp     short near ptr unk_DEAD38B
+</span><span id="line-127"><span class="lineno">127 </span>              0x0dead366: mov     eax, [rbp-4]
+</span><span id="line-128"><span class="lineno">128 </span>              0x0dead369: cdqe
+</span><span id="line-129"><span class="lineno">129 </span>              0x0dead36b: mov     rax, ds:qword_E0B10C0[rax*8]
+</span><span id="line-130"><span class="lineno">130 </span>              0x0dead373: mov     eax, eax
+</span><span id="line-131"><span class="lineno">131 </span>              0x0dead375: mov     rsi, rax
+</span><span id="line-132"><span class="lineno">132 </span>              0x0dead378: mov     edi, 0DEAD55Dh
+</span><span id="line-133"><span class="lineno">133 </span>              0x0dead37d: mov     eax, 0
+</span><span id="line-134"><span class="lineno">134 </span>              0x0dead382: call    near ptr _printf
+</span><span id="line-135"><span class="lineno">135 </span>              0x0dead387: add     dword ptr [rbp-4], 1
+</span><span id="line-136"><span class="lineno">136 </span>              0x0dead38b: cmp     dword ptr [rbp-4], 7
+</span><span id="line-137"><span class="lineno">137 </span>              0x0dead38f: jle     short loc_DEAD366
+</span><span id="line-138"><span class="lineno">138 </span>              0x0dead391: mov     edi, 0DEAD564h
+</span><span id="line-139"><span class="lineno">139 </span>              0x0dead396: call    near ptr _puts
+</span><span id="line-140"><span class="lineno">140 </span>              0x0dead39b: mov     eax, 0
+</span><span id="line-141"><span class="lineno">141 </span>              0x0dead3a0: call    near ptr unk_DEAD3AF
+</span><span id="line-142"><span class="lineno">142 </span>              0x0dead3a5: leave
+</span><span id="line-143"><span class="lineno">143 </span>0x0e0b0c90 -&gt; 0x0dead3b3: sub     rsp, 10h
+</span><span id="line-144"><span class="lineno">144 </span>              0x0dead3b7: mov     edx, 0
+</span><span id="line-145"><span class="lineno">145 </span>              0x0dead3bc: mov     esi, 0
+</span><span id="line-146"><span class="lineno">146 </span>              0x0dead3c1: mov     edi, 3
+</span><span id="line-147"><span class="lineno">147 </span>              0x0dead3c6: call    near ptr _accept
+</span><span id="line-148"><span class="lineno">148 </span>              0x0dead3cb: mov     [rbp-4], eax
+</span><span id="line-149"><span class="lineno">149 </span>              0x0dead3ce: mov     eax, [rbp-4]
+</span><span id="line-150"><span class="lineno">150 </span>              0x0dead3d1: mov     ecx, 0
+</span><span id="line-151"><span class="lineno">151 </span>              0x0dead3d6: mov     edx, 1000h
+</span><span id="line-152"><span class="lineno">152 </span>              0x0dead3db: mov     esi, 0E0B10C0h
+</span><span id="line-153"><span class="lineno">153 </span>              0x0dead3e0: mov     edi, eax
+</span><span id="line-154"><span class="lineno">154 </span>              0x0dead3e2: call    near ptr _recv
+</span><span id="line-155"><span class="lineno">155 </span>              0x0dead3e7: mov     eax, [rbp-4]
+</span><span id="line-156"><span class="lineno">156 </span>              0x0dead3ea: mov     edi, eax
+</span><span id="line-157"><span class="lineno">157 </span>              0x0dead3ec: mov     eax, 0
+</span><span id="line-158"><span class="lineno">158 </span>              0x0dead3f1: call    near ptr _close
+</span><span id="line-159"><span class="lineno">159 </span>              0x0dead3f6: mov     edx, 0E0AF0A0h
+</span><span id="line-160"><span class="lineno">160 </span>              0x0dead3fb: mov     esi, 0E0B00A0h
+</span><span id="line-161"><span class="lineno">161 </span>              0x0dead400: mov     eax, 200h
+</span><span id="line-162"><span class="lineno">162 </span>              0x0dead405: mov     rdi, rdx
+</span><span id="line-163"><span class="lineno">163 </span>              0x0dead408: mov     rcx, rax
+</span><span id="line-164"><span class="lineno">164 </span>              0x0dead40b: rep movsq
+</span><span id="line-165"><span class="lineno">165 </span>              0x0dead40e: mov     eax, 0E0B10C0h
+</span><span id="line-166"><span class="lineno">166 </span>              0x0dead413: mov     rdi, rax
+</span><span id="line-167"><span class="lineno">167 </span>              0x0dead416: mov     eax, 0E0B20C0h
+</span><span id="line-168"><span class="lineno">168 </span>              0x0dead41b: mov     rsi, rax
+</span><span id="line-169"><span class="lineno">169 </span>              0x0dead41e: mov     eax, 0E0AF8A0h
+</span><span id="line-170"><span class="lineno">170 </span>              0x0dead423: mov     rsp, rax
+</span></pre></div>
+</figure></div>
+<p>There are four conditional jumps in there. They all jump past the next instruction and directly to the <code>retn</code>. In all four cases the following instruction adds to <code>rsp</code> which is effectively a jump in the stack-program.</p>
+<p>Looking at the stack-program I notice that</p>
+<ol type="1">
+<li><p>It looks like it is “compiled” from some higher-level language (<code>add rsi</code>/<code>sub rsi</code> -instructions?)</p></li>
+<li><p>The last two gadgets are huge; they are probably “real” functions. The second one (the pointer at 0x0e0bc90) is just back in the <code>accept</code>-loop, so the first one (pointer at 0x0ebc88) is probably a win-function.</p></li>
+</ol>
+<p>First I group the program by which instructions I guess belong to the same higher-level language operation:</p>
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet3" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">  1 </span>    pop     rcx ;; = 0x8
+</span><span id="line-2"><span class="lineno">  2 </span>    pop     r9  ;; = 0x1337deadbeef0095
+</span><span id="line-3"><span class="lineno">  3 </span>
+</span><span id="line-4"><span class="lineno">  4 </span>    mov     rax, [rdi]
+</span><span id="line-5"><span class="lineno">  5 </span>    add     rsi, 8
+</span><span id="line-6"><span class="lineno">  6 </span>    mov     [rsi], rax
+</span><span id="line-7"><span class="lineno">  7 </span>    mov     r8, [rsi]
+</span><span id="line-8"><span class="lineno">  8 </span>    sub     rsi, 8
+</span><span id="line-9"><span class="lineno">  9 </span>
+</span><span id="line-10"><span class="lineno"> 10 </span>    add     rdi, 8
+</span><span id="line-11"><span class="lineno"> 11 </span>
+</span><span id="line-12"><span class="lineno"> 12 </span>    add     rsi, 8
+</span><span id="line-13"><span class="lineno"> 13 </span>    mov     [rsi], r9
+</span><span id="line-14"><span class="lineno"> 14 </span>    mov     rax, [rsi]
+</span><span id="line-15"><span class="lineno"> 15 </span>    sub     rsi, 8
+</span><span id="line-16"><span class="lineno"> 16 </span>
+</span><span id="line-17"><span class="lineno"> 17 </span>    pop     rbx ;; = 0xcafe
+</span><span id="line-18"><span class="lineno"> 18 </span>    imul    rax, rbx
+</span><span id="line-19"><span class="lineno"> 19 </span>
+</span><span id="line-20"><span class="lineno"> 20 </span>    add     rsi, 8
+</span><span id="line-21"><span class="lineno"> 21 </span>    mov     [rsi], rax
+</span><span id="line-22"><span class="lineno"> 22 </span>    mov     r9, [rsi]
+</span><span id="line-23"><span class="lineno"> 23 </span>    sub     rsi, 8
+</span><span id="line-24"><span class="lineno"> 24 </span>
+</span><span id="line-25"><span class="lineno"> 25 </span>    add     rsi, 8
+</span><span id="line-26"><span class="lineno"> 26 </span>    mov     [rsi], r9
+</span><span id="line-27"><span class="lineno"> 27 </span>    mov     rax, [rsi]
+</span><span id="line-28"><span class="lineno"> 28 </span>    sub     rsi, 8
+</span><span id="line-29"><span class="lineno"> 29 </span>
+</span><span id="line-30"><span class="lineno"> 30 </span>    pop     rbx ;; = 0xbeef
+</span><span id="line-31"><span class="lineno"> 31 </span>    add     rax, rbx
+</span><span id="line-32"><span class="lineno"> 32 </span>
+</span><span id="line-33"><span class="lineno"> 33 </span>    add     rsi, 8
+</span><span id="line-34"><span class="lineno"> 34 </span>    mov     [rsi], rax
+</span><span id="line-35"><span class="lineno"> 35 </span>    mov     r9, [rsi]
+</span><span id="line-36"><span class="lineno"> 36 </span>    sub     rsi, 8
+</span><span id="line-37"><span class="lineno"> 37 </span>
+</span><span id="line-38"><span class="lineno"> 38 </span>    pop     r12 ;; = 0x1
+</span><span id="line-39"><span class="lineno"> 39 </span>    pop     r10 ;; = 0x3419
+</span><span id="line-40"><span class="lineno"> 40 </span>    pop     rax ;; = 0x0
+</span><span id="line-41"><span class="lineno"> 41 </span>    pop     rbx ;; = 0x0
+</span><span id="line-42"><span class="lineno"> 42 </span>
+</span><span id="line-43"><span class="lineno"> 43 </span>    pop     rdx ;; = 0x1d8
+</span><span id="line-44"><span class="lineno"> 44 </span>    cmp     rax, rbx
+</span><span id="line-45"><span class="lineno"> 45 </span>    jnz     short near ptr unk_DEAD1A7
+</span><span id="line-46"><span class="lineno"> 46 </span>    add     rsp, rdx
+</span><span id="line-47"><span class="lineno"> 47 </span>
+</span><span id="line-48"><span class="lineno"> 48 </span>    add     rsi, 8
+</span><span id="line-49"><span class="lineno"> 49 </span>    mov     [rsi], r10
+</span><span id="line-50"><span class="lineno"> 50 </span>    mov     r11, [rsi]
+</span><span id="line-51"><span class="lineno"> 51 </span>    sub     rsi, 8
+</span><span id="line-52"><span class="lineno"> 52 </span>
+</span><span id="line-53"><span class="lineno"> 53 </span>    add     rsi, 8
+</span><span id="line-54"><span class="lineno"> 54 </span>    mov     [rsi], r11
+</span><span id="line-55"><span class="lineno"> 55 </span>    mov     rax, [rsi]
+</span><span id="line-56"><span class="lineno"> 56 </span>    sub     rsi, 8
+</span><span id="line-57"><span class="lineno"> 57 </span>
+</span><span id="line-58"><span class="lineno"> 58 </span>    pop     rbx ;; = 0x1
+</span><span id="line-59"><span class="lineno"> 59 </span>    and     rax, rbx
+</span><span id="line-60"><span class="lineno"> 60 </span>
+</span><span id="line-61"><span class="lineno"> 61 </span>    add     rsi, 8
+</span><span id="line-62"><span class="lineno"> 62 </span>    mov     [rsi], rax
+</span><span id="line-63"><span class="lineno"> 63 </span>    mov     r11, [rsi]
+</span><span id="line-64"><span class="lineno"> 64 </span>    sub     rsi, 8
+</span><span id="line-65"><span class="lineno"> 65 </span>
+</span><span id="line-66"><span class="lineno"> 66 </span>    add     rsi, 8
+</span><span id="line-67"><span class="lineno"> 67 </span>    mov     [rsi], r11
+</span><span id="line-68"><span class="lineno"> 68 </span>    mov     rax, [rsi]
+</span><span id="line-69"><span class="lineno"> 69 </span>    sub     rsi, 8
+</span><span id="line-70"><span class="lineno"> 70 </span>
+</span><span id="line-71"><span class="lineno"> 71 </span>    pop     rbx ;; = 0x1
+</span><span id="line-72"><span class="lineno"> 72 </span>
+</span><span id="line-73"><span class="lineno"> 73 </span>    pop     rdx ;; = 0x68
+</span><span id="line-74"><span class="lineno"> 74 </span>    cmp     rax, rbx
+</span><span id="line-75"><span class="lineno"> 75 </span>    jz      short near ptr unk_DEAD1B6
+</span><span id="line-76"><span class="lineno"> 76 </span>    add     rsp, rdx
+</span><span id="line-77"><span class="lineno"> 77 </span>
+</span><span id="line-78"><span class="lineno"> 78 </span>    add     rsi, 8
+</span><span id="line-79"><span class="lineno"> 79 </span>    mov     [rsi], r12
+</span><span id="line-80"><span class="lineno"> 80 </span>    mov     rax, [rsi]
+</span><span id="line-81"><span class="lineno"> 81 </span>    sub     rsi, 8
+</span><span id="line-82"><span class="lineno"> 82 </span>
+</span><span id="line-83"><span class="lineno"> 83 </span>    add     rsi, 8
+</span><span id="line-84"><span class="lineno"> 84 </span>    mov     [rsi], r8
+</span><span id="line-85"><span class="lineno"> 85 </span>    mov     rbx, [rsi]
+</span><span id="line-86"><span class="lineno"> 86 </span>    sub     rsi, 8
+</span><span id="line-87"><span class="lineno"> 87 </span>
+</span><span id="line-88"><span class="lineno"> 88 </span>    imul    rax, rbx
+</span><span id="line-89"><span class="lineno"> 89 </span>
+</span><span id="line-90"><span class="lineno"> 90 </span>    add     rsi, 8
+</span><span id="line-91"><span class="lineno"> 91 </span>    mov     [rsi], rax
+</span><span id="line-92"><span class="lineno"> 92 </span>    mov     r12, [rsi]
+</span><span id="line-93"><span class="lineno"> 93 </span>    sub     rsi, 8
+</span><span id="line-94"><span class="lineno"> 94 </span>
+</span><span id="line-95"><span class="lineno"> 95 </span>    add     rsi, 8
+</span><span id="line-96"><span class="lineno"> 96 </span>    mov     [rsi], r8
+</span><span id="line-97"><span class="lineno"> 97 </span>    mov     rax, [rsi]
+</span><span id="line-98"><span class="lineno"> 98 </span>    sub     rsi, 8
+</span><span id="line-99"><span class="lineno"> 99 </span>
+</span><span id="line-100"><span class="lineno">100 </span>    add     rsi, 8
+</span><span id="line-101"><span class="lineno">101 </span>    mov     [rsi], r8
+</span><span id="line-102"><span class="lineno">102 </span>    mov     rbx, [rsi]
+</span><span id="line-103"><span class="lineno">103 </span>    sub     rsi, 8
+</span><span id="line-104"><span class="lineno">104 </span>
+</span><span id="line-105"><span class="lineno">105 </span>    imul    rax, rbx
+</span><span id="line-106"><span class="lineno">106 </span>
+</span><span id="line-107"><span class="lineno">107 </span>    add     rsi, 8
+</span><span id="line-108"><span class="lineno">108 </span>    mov     [rsi], rax
+</span><span id="line-109"><span class="lineno">109 </span>    mov     r8, [rsi]
+</span><span id="line-110"><span class="lineno">110 </span>    sub     rsi, 8
+</span><span id="line-111"><span class="lineno">111 </span>
+</span><span id="line-112"><span class="lineno">112 </span>    add     rsi, 8
+</span><span id="line-113"><span class="lineno">113 </span>    mov     [rsi], r10
+</span><span id="line-114"><span class="lineno">114 </span>    mov     rax, [rsi]
+</span><span id="line-115"><span class="lineno">115 </span>    sub     rsi, 8
+</span><span id="line-116"><span class="lineno">116 </span>
+</span><span id="line-117"><span class="lineno">117 </span>    shr     rax, 1
+</span><span id="line-118"><span class="lineno">118 </span>
+</span><span id="line-119"><span class="lineno">119 </span>    add     rsi, 8
+</span><span id="line-120"><span class="lineno">120 </span>    mov     [rsi], rax
+</span><span id="line-121"><span class="lineno">121 </span>    mov     r10, [rsi]
+</span><span id="line-122"><span class="lineno">122 </span>    sub     rsi, 8
+</span><span id="line-123"><span class="lineno">123 </span>
+</span><span id="line-124"><span class="lineno">124 </span>    add     rsi, 8
+</span><span id="line-125"><span class="lineno">125 </span>    mov     [rsi], r10
+</span><span id="line-126"><span class="lineno">126 </span>    mov     rax, [rsi]
+</span><span id="line-127"><span class="lineno">127 </span>    sub     rsi, 8
+</span><span id="line-128"><span class="lineno">128 </span>
+</span><span id="line-129"><span class="lineno">129 </span>    pop     rbx ;; = 0x0
+</span><span id="line-130"><span class="lineno">130 </span>    pop     rdx ;; = 0xfffffffffffffde0
+</span><span id="line-131"><span class="lineno">131 </span>
+</span><span id="line-132"><span class="lineno">132 </span>    cmp     rax, rbx
+</span><span id="line-133"><span class="lineno">133 </span>    jz      short locret_DEAD1B6
+</span><span id="line-134"><span class="lineno">134 </span>    add     rsp, rdx
+</span><span id="line-135"><span class="lineno">135 </span>
+</span><span id="line-136"><span class="lineno">136 </span>    add     rsi, 8
+</span><span id="line-137"><span class="lineno">137 </span>    mov     [rsi], r12
+</span><span id="line-138"><span class="lineno">138 </span>    mov     rax, [rsi]
+</span><span id="line-139"><span class="lineno">139 </span>    sub     rsi, 8
+</span><span id="line-140"><span class="lineno">140 </span>
+</span><span id="line-141"><span class="lineno">141 </span>    add     rsi, 8
+</span><span id="line-142"><span class="lineno">142 </span>    mov     [rsi], r9
+</span><span id="line-143"><span class="lineno">143 </span>    mov     rbx, [rsi]
+</span><span id="line-144"><span class="lineno">144 </span>    sub     rsi, 8
+</span><span id="line-145"><span class="lineno">145 </span>
+</span><span id="line-146"><span class="lineno">146 </span>    pop     rdx ;; = 0x20
+</span><span id="line-147"><span class="lineno">147 </span>
+</span><span id="line-148"><span class="lineno">148 </span>    cmp     rax, rbx
+</span><span id="line-149"><span class="lineno">149 </span>    jz      short locret_DEAD1B6
+</span><span id="line-150"><span class="lineno">150 </span>    add     rsp, rdx
+</span><span id="line-151"><span class="lineno">151 </span>
+</span><span id="line-152"><span class="lineno">152 </span>    pop     rdx ;; = 0xfffffffffffffc38
+</span><span id="line-153"><span class="lineno">153 </span>    loop    near ptr unk_DEAD1DB
+</span><span id="line-154"><span class="lineno">154 </span>WIN:
+</span><span id="line-155"><span class="lineno">155 </span>    ...
+</span><span id="line-156"><span class="lineno">156 </span>EXIT:
+</span><span id="line-157"><span class="lineno">157 </span>    ...
+</span></pre></div>
+</figure></div>
+<p>Points of interest:</p>
+<ul>
+<li><code>rsi</code> is only used for moving a value from one register to another.</li>
+<li><code>rdi</code> (pointer to the data received from the network, remember?) is only modified in one place: 8 is being added shortly after reading one qword from <code>[rdi]</code> into <code>rax</code>.</li>
+<li>Before each conditional jump a constant is loaded into <code>rdx</code> and depending on whether <code>rax</code> and <code>rbx</code> is equal or not <code>rdx</code> is added to <code>rsp</code>.</li>
+<li>Right before the win-function is a <code>loop</code> instruction that jumps to <code>add rsp​,    rdx ; retn</code>. These instructions were of course not found by my IDA script.</li>
+<li><code>rcx</code> is set to 8 in the beginning and then only modified by the <code>loop</code> instruction.</li>
+</ul>
+<p>Rewriting register assignment, jumps and inserting labels gives:</p>
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet4" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span>    rcx &lt;- 8
+</span><span id="line-2"><span class="lineno"> 2 </span>    r9  &lt;- 0x1337deadbeef0095
+</span><span id="line-3"><span class="lineno"> 3 </span>START:
+</span><span id="line-4"><span class="lineno"> 4 </span>    rax &lt;- get_next_input_qword
+</span><span id="line-5"><span class="lineno"> 5 </span>    r8  &lt;- rax
+</span><span id="line-6"><span class="lineno"> 6 </span>
+</span><span id="line-7"><span class="lineno"> 7 </span>    rax &lt;- r9
+</span><span id="line-8"><span class="lineno"> 8 </span>    rbx &lt;- 0xcafe
+</span><span id="line-9"><span class="lineno"> 9 </span>    rax &lt;- rax * rbx
+</span><span id="line-10"><span class="lineno">10 </span>    r9  &lt;- rax
+</span><span id="line-11"><span class="lineno">11 </span>
+</span><span id="line-12"><span class="lineno">12 </span>    rax &lt;- r9
+</span><span id="line-13"><span class="lineno">13 </span>    rbx &lt;- 0xbeef
+</span><span id="line-14"><span class="lineno">14 </span>    rax &lt;- rax + rbx
+</span><span id="line-15"><span class="lineno">15 </span>    r9  &lt;- rax
+</span><span id="line-16"><span class="lineno">16 </span>
+</span><span id="line-17"><span class="lineno">17 </span>    r12 &lt;- 1
+</span><span id="line-18"><span class="lineno">18 </span>    r10 &lt;- 0x3419
+</span><span id="line-19"><span class="lineno">19 </span>
+</span><span id="line-20"><span class="lineno">20 </span>    rax &lt;- 0
+</span><span id="line-21"><span class="lineno">21 </span>    rbx &lt;- 0
+</span><span id="line-22"><span class="lineno">22 </span>    goto LBL3 if rax == rbx
+</span><span id="line-23"><span class="lineno">23 </span>
+</span><span id="line-24"><span class="lineno">24 </span>LBL1:
+</span><span id="line-25"><span class="lineno">25 </span>    r11 &lt;- r10
+</span><span id="line-26"><span class="lineno">26 </span>
+</span><span id="line-27"><span class="lineno">27 </span>    rax &lt;- r11
+</span><span id="line-28"><span class="lineno">28 </span>    rbx &lt;- 1
+</span><span id="line-29"><span class="lineno">29 </span>    rax &lt;- rax &amp; rbx
+</span><span id="line-30"><span class="lineno">30 </span>    r11 &lt;- rax
+</span><span id="line-31"><span class="lineno">31 </span>
+</span><span id="line-32"><span class="lineno">32 </span>    rax &lt;- r11
+</span><span id="line-33"><span class="lineno">33 </span>    rbx &lt;- 1
+</span><span id="line-34"><span class="lineno">34 </span>    goto LBL2 if rax &lt;&gt; rbx
+</span><span id="line-35"><span class="lineno">35 </span>
+</span><span id="line-36"><span class="lineno">36 </span>    rax &lt;- r12
+</span><span id="line-37"><span class="lineno">37 </span>    rbx &lt;- r8
+</span><span id="line-38"><span class="lineno">38 </span>    rax &lt;- rax * rbx
+</span><span id="line-39"><span class="lineno">39 </span>    r12 &lt;- rax
+</span><span id="line-40"><span class="lineno">40 </span>
+</span><span id="line-41"><span class="lineno">41 </span>LBL2:
+</span><span id="line-42"><span class="lineno">42 </span>    rax &lt;- r8
+</span><span id="line-43"><span class="lineno">43 </span>    rbx &lt;- r8
+</span><span id="line-44"><span class="lineno">44 </span>    rax &lt;- rax * rbx
+</span><span id="line-45"><span class="lineno">45 </span>    r8  &lt;- rax
+</span><span id="line-46"><span class="lineno">46 </span>
+</span><span id="line-47"><span class="lineno">47 </span>    rax &lt;- r10
+</span><span id="line-48"><span class="lineno">48 </span>    rax &lt;- rax &gt;&gt; 1
+</span><span id="line-49"><span class="lineno">49 </span>    r10 &lt;- rax
+</span><span id="line-50"><span class="lineno">50 </span>
+</span><span id="line-51"><span class="lineno">51 </span>LBL3:
+</span><span id="line-52"><span class="lineno">52 </span>    rax &lt;- r10
+</span><span id="line-53"><span class="lineno">53 </span>    rbx &lt;- 0
+</span><span id="line-54"><span class="lineno">54 </span>    goto LBL1 if rax &lt;&gt; rbx
+</span><span id="line-55"><span class="lineno">55 </span>
+</span><span id="line-56"><span class="lineno">56 </span>    rax &lt;- r12
+</span><span id="line-57"><span class="lineno">57 </span>    rbx &lt;- r9
+</span><span id="line-58"><span class="lineno">58 </span>    goto EXIT if rax &lt;&gt; rbx
+</span><span id="line-59"><span class="lineno">59 </span>
+</span><span id="line-60"><span class="lineno">60 </span>    loop START
+</span><span id="line-61"><span class="lineno">61 </span>WIN:
+</span><span id="line-62"><span class="lineno">62 </span>    ...
+</span><span id="line-63"><span class="lineno">63 </span>EXIT:
+</span><span id="line-64"><span class="lineno">64 </span>    ...
+</span></pre></div>
+</figure></div>
+<p>Aha, <code>rax</code> and <code>rbx</code> are only used as temporary variables (notice that the compiler completely breaks character in the right-shift operation where 1 is used directly rather than being loaded into <code>rbx</code>).</p>
+<p>Getting rid of <code>rax</code> and <code>rbx</code>:</p>
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet5" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span>    rcx &lt;- 8
+</span><span id="line-2"><span class="lineno"> 2 </span>    r9  &lt;- 0x1337deadbeef0095
+</span><span id="line-3"><span class="lineno"> 3 </span>START:
+</span><span id="line-4"><span class="lineno"> 4 </span>    r8  &lt;- get_next_input_qword
+</span><span id="line-5"><span class="lineno"> 5 </span>
+</span><span id="line-6"><span class="lineno"> 6 </span>    r9  &lt;- r9 * 0xcafe
+</span><span id="line-7"><span class="lineno"> 7 </span>    r9  &lt;- r9 + 0xbeef
+</span><span id="line-8"><span class="lineno"> 8 </span>
+</span><span id="line-9"><span class="lineno"> 9 </span>    r12 &lt;- 1
+</span><span id="line-10"><span class="lineno">10 </span>    r10 &lt;- 0x3419
+</span><span id="line-11"><span class="lineno">11 </span>    goto LBL3
+</span><span id="line-12"><span class="lineno">12 </span>
+</span><span id="line-13"><span class="lineno">13 </span>LBL1:
+</span><span id="line-14"><span class="lineno">14 </span>    r11 &lt;- r10
+</span><span id="line-15"><span class="lineno">15 </span>    r11 &lt;- r11 &amp; 1
+</span><span id="line-16"><span class="lineno">16 </span>    goto LBL2 if r11 &lt;&gt; 1
+</span><span id="line-17"><span class="lineno">17 </span>    r12 &lt;- r12 * r8
+</span><span id="line-18"><span class="lineno">18 </span>
+</span><span id="line-19"><span class="lineno">19 </span>LBL2:
+</span><span id="line-20"><span class="lineno">20 </span>    r8  &lt;- r8 * r8
+</span><span id="line-21"><span class="lineno">21 </span>    r10 &lt;- r10 &gt;&gt; 1
+</span><span id="line-22"><span class="lineno">22 </span>
+</span><span id="line-23"><span class="lineno">23 </span>LBL3:
+</span><span id="line-24"><span class="lineno">24 </span>    goto LBL1 if r10 &lt;&gt; 0
+</span><span id="line-25"><span class="lineno">25 </span>
+</span><span id="line-26"><span class="lineno">26 </span>    goto EXIT if r12 &lt;&gt; r9
+</span><span id="line-27"><span class="lineno">27 </span>
+</span><span id="line-28"><span class="lineno">28 </span>    loop START
+</span><span id="line-29"><span class="lineno">29 </span>WIN:
+</span><span id="line-30"><span class="lineno">30 </span>    ...
+</span><span id="line-31"><span class="lineno">31 </span>EXIT:
+</span><span id="line-32"><span class="lineno">32 </span>    ...
+</span></pre></div>
+</figure></div>
+<p>One final rewrite (even though I’m sure you have it figured out):</p>
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet6" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span>r9  &lt;- 0x1337deadbeef0095
+</span><span id="line-2"><span class="lineno"> 2 </span>run 8 times {
+</span><span id="line-3"><span class="lineno"> 3 </span>  r8  &lt;- get_next_input_qword
+</span><span id="line-4"><span class="lineno"> 4 </span>  r9  &lt;- r9 * 0xcafe + 0xbeef
+</span><span id="line-5"><span class="lineno"> 5 </span>  r12 &lt;- 1
+</span><span id="line-6"><span class="lineno"> 6 </span>  r10 &lt;- 13337
+</span><span id="line-7"><span class="lineno"> 7 </span>  while (r10) {
+</span><span id="line-8"><span class="lineno"> 8 </span>    if (r10 &amp; 1) {
+</span><span id="line-9"><span class="lineno"> 9 </span>      r12 &lt;- r12 * r8
+</span><span id="line-10"><span class="lineno">10 </span>    }
+</span><span id="line-11"><span class="lineno">11 </span>    r8  &lt;- r8 * r8
+</span><span id="line-12"><span class="lineno">12 </span>    r10 &lt;- r10 / 2
+</span><span id="line-13"><span class="lineno">13 </span>  }
+</span><span id="line-14"><span class="lineno">14 </span>  if (r9 != r12) {
+</span><span id="line-15"><span class="lineno">15 </span>    exit();
+</span><span id="line-16"><span class="lineno">16 </span>  }
+</span><span id="line-17"><span class="lineno">17 </span>}
+</span><span id="line-18"><span class="lineno">18 </span>win();
+</span></pre></div>
+</figure></div>
+<p>This code computes a series as:</p>
+<p><span class="math display">\[
+    x^0 = \tt{0x1337deadbeef0095} \\
+    x^n = x^{n-1} \cdot \tt{0xcafe} + \tt{0xbeef}
+\]</span></p>
+<p>Split the input into qwords, <span class="math inline">\(y_1, ..., y_8\)</span>. For each <span class="math inline">\(y_i\)</span> <a href="http://en.wikipedia.org/wiki/Exponentiation_by_squaring">exponentiation by squaring</a> is used to compute <span class="math inline">\(y_{i}^{13337}\)</span>.</p>
+<p>If <span class="math inline">\(y_{i}^{13337} = x_i\)</span> for <span class="math inline">\(i = 1, ..., 8\)</span> the win-function is called. Easy-peasy.</p>
+<h4 id="team-member-kriztw-solved-this-part" class="notoc">Team member kriztw solved this part:</h4>
+<p>Because register values wrap around, computation effectively happens modulo <span class="math inline">\(2^{64}\)</span>.</p>
+<p>By <a href="http://en.wikipedia.org/wiki/Euler%27s_theorem">Euler’s theorem</a> we have that <span class="math inline">\(a^{\phi(n)} \equiv 1 \mod n\)</span>, so if we can find <span class="math inline">\(d \equiv 13337^{-1} \mod \phi(n)\)</span> we will have <span class="math inline">\(x_{i}^{d} = (y_{i}^{13337})^d = y_{i}^{13337 \cdot d} = y_{i}^1 = y_i\)</span>.</p>
+<p>Every odd number is relatively prime to <span class="math inline">\(2^{64}\)</span> so <span class="math inline">\(\phi(2^{64})\)</span> is <span class="math inline">\(2^{63}\)</span>. And here’s the program:</p>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet7.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span><span class="kn">import</span> <span class="nn">gmpy</span>
+</span><span id="line-2"><span class="lineno"> 2 </span>
+</span><span id="line-3"><span class="lineno"> 3 </span><span class="n">N</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">64</span>
+</span><span id="line-4"><span class="lineno"> 4 </span>
+</span><span id="line-5"><span class="lineno"> 5 </span><span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x1337deadbeef0095</span><span class="p">]</span>
+</span><span id="line-6"><span class="lineno"> 6 </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+</span><span id="line-7"><span class="lineno"> 7 </span>    <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mh">0xcafe</span> <span class="o">+</span> <span class="mh">0xbeef</span><span class="p">)</span> <span class="o">%</span> <span class="n">N</span><span class="p">)</span>
+</span><span id="line-8"><span class="lineno"> 8 </span>
+</span><span id="line-9"><span class="lineno"> 9 </span><span class="n">d</span> <span class="o">=</span> <span class="n">gmpy</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="mi">13337</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">63</span><span class="p">)</span>
+</span><span id="line-10"><span class="lineno">10 </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+</span><span id="line-11"><span class="lineno">11 </span>    <span class="n">y</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span><span id="line-12"><span class="lineno">12 </span>    <span class="k">assert</span> <span class="nb">pow</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">13337</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">==</span> <span class="n">x</span>
+</span><span id="line-13"><span class="lineno">13 </span>    <span class="k">print</span> <span class="n">y</span>
+</span></pre></div>
+</figure></div>
+<p>Flag: <strong><code>0ctf{c97155a5e288fa45f926b1058e4e0385d6ccde8513002885dc67948524bcbc85}</code></strong></p>
+
+<br />
+
+(<a href="../../../posts/0ctf/r0ops">To top</a>)
+
+  </article>
+
+</body>
+
+</html>

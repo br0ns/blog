@@ -1,0 +1,4 @@
+0x0dead1f4: jmp     2 ;; 0x0dead1f8
+0x0dead1f6: or      esi, esi ;; probably just for alignment
+0x0dead1f8: pop     rcx
+0x0dead1f8: retn

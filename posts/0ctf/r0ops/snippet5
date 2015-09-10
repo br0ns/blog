@@ -1,0 +1,32 @@
+    rcx <- 8
+    r9  <- 0x1337deadbeef0095
+START:
+    r8  <- get_next_input_qword
+
+    r9  <- r9 * 0xcafe
+    r9  <- r9 + 0xbeef
+
+    r12 <- 1
+    r10 <- 0x3419
+    goto LBL3
+
+LBL1:
+    r11 <- r10
+    r11 <- r11 & 1
+    goto LBL2 if r11 <> 1
+    r12 <- r12 * r8
+
+LBL2:
+    r8  <- r8 * r8
+    r10 <- r10 >> 1
+
+LBL3:
+    goto LBL1 if r10 <> 0
+
+    goto EXIT if r12 <> r9
+
+    loop START
+WIN:
+    ...
+EXIT:
+    ...
