@@ -1,0 +1,58 @@
+#tags-list {
+    float:right;
+    display:inline;
+    padding-left: 30pt;
+    padding-bottom: 20pt;
+    padding-top: 1em;
+    background: none;
+    width: 160pt;
+
+    ul, ol {
+        margin-left: 0.3em;
+    }
+
+    .hr {
+        width: 100%;
+        margin: 5pt 0 2pt -20px;
+        border-top: 1px solid #aaa;
+        box-shadow: 0 0 5px 0px rgba(0,0,0,0.1);
+    }
+
+    ul {
+        margin-left: -10pt;
+        font-size: 0.9em;
+
+        li {
+            display:block;
+
+            &:before {
+                content: "";
+            }
+        }
+    }
+
+    &:after {
+        clear: both;
+    }
+}
+
+#post-list {
+    position: relative;
+    font-size: 130%;
+    overflow: auto;
+
+    .left-of {
+        position: absolute;
+        left: -80pt;
+    }
+
+    .date {
+        font-size: 70%;
+        vertical-align: baseline;
+    }
+
+    ul, ol {
+        margin: 0;
+        list-style: none;
+    }
+}

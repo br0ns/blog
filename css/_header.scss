@@ -1,0 +1,130 @@
+#header-container {
+    background: $color-header;
+}
+
+#header {
+    width: $content-width;
+    margin: 0 auto;
+    padding-top: 10pt;
+    padding-bottom: 10pt;
+}
+
+#title {
+    font-size: 300%;
+    font-family: $font-title;
+    color: $color-title;
+}
+
+#byline {
+    color: $color-byline;
+    margin-left: 30pt;
+    font-weight: bold;
+    font-family: $font-byline;
+}
+
+#navbar {
+    /* hack to hide the rounded corners of the shadow */
+    margin: 0 0 0 -10em;
+    box-shadow: 5em 0px 10px 0px #000;
+    /* 10em from the hack plus 1em that we want is 11em */
+    padding: 0 1em 0 11em;
+    height: 2.5em;
+    background: $color-navbar;
+}
+
+#main-nav {
+    color: $color-navbar-text;
+    font-family: $font-navbar;
+    font-weight: lighter;
+    text-transform: uppercase;
+    display: inline-block;
+
+    ul {
+    }
+
+    li {
+        display: inline-block;
+        line-height: 1;
+        padding: 0.75em 0;
+
+        &:before {
+            content: "|";
+            color: $color-navbar-light;
+            padding: 0 1em;
+        }
+
+        &:first-child:before {
+            content: " ";
+            padding: 0;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+                color: white;
+            }
+        }
+    }
+
+}
+
+#meta {
+    color: $color-meta;
+    font-family: $font-meta;
+    font-size: 75%;
+    padding-top: 10pt;
+
+    ul {
+    }
+
+    li {
+        display: inline-block;
+
+        &:before {
+            content: "│";
+            color: $color-meta;
+            padding: 0 0.5em;
+        }
+
+        &:first-child:before {
+            content: " ";
+            padding: 0;
+        }
+
+        & a:hover {
+            color: $color-link;
+        }
+    }
+}
+
+/* for fixing the navigation bar */
+.fixed {
+    width:100%;
+    position: fixed;
+    top: 0;
+}
+
+#search-link {
+    cursor: pointer;
+}
+
+#search-form-container {
+    display:inline-block;
+    .search {
+        display: none;
+        input[type="text"] {
+            background: #A0858F;
+            background: #ddd;
+            border: 1px solid #222;
+            font-family: $font-navbar;
+            height: 1.4em;
+            width: 100%;
+            padding: 0 10px;
+            margin-left: 1em;
+            border-radius: 5px;
+            color: #222;
+        }
+    }
+}

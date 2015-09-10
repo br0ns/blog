@@ -1,0 +1,247 @@
+#content {
+    padding-bottom: 50pt;
+    margin: auto;
+    margin-top: 20pt;
+    width: $content-width;
+    font-family: $font-default;
+    color: $color-text;
+
+    p {
+        margin-bottom: 1em;
+    }
+
+    ul, ol {
+        margin-left: 2em;
+        margin-bottom: 1em;
+        ul, ol {
+            margin-left: 1em;
+        }
+        li {
+            list-style-type: none;
+            position: relative;
+            &:before {
+                position: absolute;
+                left: -1em;
+                color: $color-link-light;
+                content: "»";
+                font-weight: bold;
+            }
+        }
+    }
+
+    img {
+        max-width: 100%;
+    }
+
+    hr {
+            width:900px;
+            margin-left: -50px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: none;
+            border-top: 1px solid #aaa;
+            box-shadow: 0 0 5px 0px rgba(0,0,0,0.1);
+    }
+
+    a {
+        color: $color-link;
+        padding: 0 2px;
+        border-radius: 5px;
+
+        &:hover {
+            background: $color-link-light;
+            color: white;
+            border-radius: 5px;
+        }
+    }
+
+    h1, h2, h3, h4, h5 {
+        font-weight: lighter;
+        font-family: $font-heading;
+        margin:0;
+        margin-bottom: 0.4em;
+
+        a {
+            padding: 0;
+            color: inherit;
+            &:hover {
+                color: inherit;
+                background: inherit;
+            }
+        }
+    }
+
+    h1 {
+        font-size: 200%;
+    }
+
+    h2 {
+        font-size: 170%;
+    }
+
+    h3 {
+        font-size: 150%;
+    }
+
+    h4, h5 {
+        font-weight: bold;
+    }
+
+    blockquote, figure {
+        background: #eee;
+        margin: $figure_margin;
+        padding: 10px;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        position: relative;
+    }
+
+    /* Code blocks are full width, other figures are only as wide as they need
+     * to be
+     */
+    figure:not(.codeblock) {
+        text-align: center;
+        display: inline-block;
+    }
+
+    code {
+        background: #ddd;
+        padding: 2px 5px;
+        border-radius: 5px;
+    }
+
+    blockquote {
+        font-style: italic;
+    }
+
+    pre, code {
+        font-size: 90%;
+        font-family: $font-code;
+    }
+
+    figcaption {
+        font-size: 80%;
+        text-align:center;
+        display: block;
+        color: #444;
+
+        &:first-child {
+            margin-top: -9px;
+        }
+
+        &:last-child {
+            margin-bottom: -9px;
+        }
+    }
+
+    figure {
+        /* Remove top and left/right margins for floating figures */
+        &[align="left"],
+        &[style*="float:left"],
+        &[style*="float: left"] {
+            margin: 0 $figure-margin $figure-margin 0;
+        }
+
+        &[align="right"],
+        &[style*="float:right"],
+        &[style*="float: right"] {
+            margin: 0 0 $figure-margin $figure-margin;
+        }
+    }
+
+    blockquote, figure, pre {
+        overflow: auto;
+        /* display: block; */
+
+        &::-webkit-scrollbar {
+            margin: 2pt;
+            width: 8pt;
+            height: 15px;
+            background-color: transparant;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-top: 5px solid #eee;
+            background: #ccc;
+        }
+    }
+
+    /* Code blocks are wrapped in a div so we can make line numbers visible and
+     * still avoid going on top of floating elements.  Not sure if there's a
+     * better way...
+     */
+    .codeblock-container {
+        /* Let the inner code block keep its left margin for the line numbers,
+         * but move the rest here.
+         */
+        margin: $figure-margin;
+        margin-left: 0;
+        overflow: auto;
+
+        > figure {
+            margin: 0;
+            margin-left: $figure-margin;
+        }
+    }
+
+    .codeblock {
+        /* Make line numbers visible */
+        overflow: visible;
+
+        /* Separate captions from the code with a line */
+        figcaption {
+            &:first-child {
+                margin-bottom: 5px;
+                border-bottom: 1px solid #ccc;
+            }
+
+            &:last-child {
+                margin-top: 5px;
+                border-top: 1px solid #ccc;
+            }
+        }
+
+        /* This makes each line-<span> (the ones directly below the <pre>-tag)
+         * extend all the way to the right, so we can catch the cursor hovering
+         * over them */
+        pre > span {
+            display: block;
+
+            &:hover .lineno {
+                color: $color-link-light;
+            }
+        }
+
+        .lineno {
+            overflow: auto;
+            position: absolute;
+            font-size: 80%;
+            padding-top: 0.2em;
+            vertical-align: bottom;
+            left: -18pt;
+            color: #bbb;
+
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none;    /* Firefox       */
+            -ms-user-select: none;     /* IE10+         */
+        }
+
+        .buttons-container {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+
+            a {
+                cursor: pointer;
+                float: right;
+                color: #aaa;
+
+                &:hover {
+                    background: inherit;
+                    color: $color-link-light;
+                }
+            }
+        }
+    }
+
+}

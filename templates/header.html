@@ -1,0 +1,96 @@
+<header>
+  <div id="header">
+    <div id="title">
+      <a href="$url$">
+        $title$
+      </a>
+    </div>
+
+    $if(byline)$
+    <div id="byline">
+      $byline$
+    </div>
+    $endif$
+
+    $if(date)$
+    <div id="meta">
+      <ul>
+        <li>
+          $if(date_edited)$
+          <span title="Edited $date_edited$">
+            <i class="fa fa-calendar"></i>&nbsp;
+            $date$
+            $endif$
+
+            $if(date_edited)$
+          </span>
+          $else$
+          <i class="fa fa-calendar"></i>&nbsp;
+          $date$
+          $endif$
+        </li>
+
+        <li>
+          <i class="fa fa-code-fork"></i>&nbsp;
+          <a href="https://github.com/br0ns/blog/commit/$git_hash$" title="View on GitHub">
+            $git_abbr_hash$&hellip;
+          </a>
+        </li>
+
+        $if(tags)$
+        <li>
+          <i class="fa fa-tags"></i>&nbsp;
+          $tags$
+        </li>
+        $endif$
+
+      </ul>
+    </div>
+    $endif$
+
+  </div>
+
+  <div id="navbar-placeholder">
+
+    <div id="navbar">
+      <nav id="main-nav">
+        <ul>
+          <li>
+            <a href="/">
+              <i class="fa fa-lg fa-home"></i>
+            </a>
+          </li>
+
+          <li>
+            <a href="https://github.com/br0ns">
+              <i class="fa fa-lg fa-github"></i>
+            </a>
+          </li>
+
+          <li>
+            <a href="/about">About</a>
+          </li>
+
+          <li>
+            <a href="/tags/all">Archive</a>
+          </li>
+
+          <li>
+            <a id="search-link">Search</a>
+          </li>
+
+        </ul>
+      </nav>
+
+      <div id="search-form-container">
+        <form class="search" action="http://google.com/search" method="get">
+          <input id="input" type="text" results="0" placeholder="" autocomplete="off" spellcheck="false">
+        <input id="query" type="hidden" name="q" value="">
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+</header>

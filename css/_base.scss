@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+$transition-time: 0.1s;
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color $transition-time, background-color $transition-time;
+
+    &:hover {
+        transition: color $transition-time, background-color $transition-time;
+    }
+}
+
+body {
+    min-width: $content-width;
+    background: $color-background;
+    line-height: 1.3;
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+.highslide-dimming {
+    background: black;
+    color: black;
+}

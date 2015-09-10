@@ -1,0 +1,202 @@
+#content {
+    counter-reset: h1counter h2counter h3counter h4counter h5counter;
+
+    h1, h2, h3, h4, h5 {
+        position: relative;
+
+        .left-of {
+            position: absolute;
+            left: -50pt;
+            width: 50pt;
+        }
+
+        .link-icon {
+            visibility: hidden;
+            color: $color-link-light;
+            font-size: 70%;
+            padding-right: 0.5em;
+            text-shadow: 0 0 1px rgba(0,0,0,0.2);
+        }
+
+        &:hover .link-icon {
+            visibility: visible;
+        }
+
+        .section-number {
+            font-size: 50%;
+            /* text-decoration: underline; */
+            color: #444;
+        }
+
+        .anchor {
+            position: absolute;
+            top: -40pt;
+        }
+
+    }
+
+    h1 {
+        counter-reset: h2counter;
+        .section-number:before {
+            content: counter(h1counter) ". ";
+            counter-increment: h1counter;
+        }
+        &.notoc .section-number:before {
+            content: none;
+            counter-increment: none;
+        }
+    }
+
+    h1 ~ h2 .section-number:before {
+        content: counter(h1counter) "."
+                        counter(h2counter) ". ";
+    }
+
+    h2 {
+        counter-reset: h3counter;
+        .section-number:before {
+            counter-increment: h2counter;
+            content: counter(h2counter) ". ";
+        }
+
+        &.notoc .section-number:before {
+            content: none;
+            counter-increment: none;
+        }
+    }
+
+    h1 ~ h2 ~ h3 .section-number:before {
+        content: counter(h1counter) "."
+                        counter(h2counter) "."
+                        counter(h3counter) ". ";
+    }
+
+    h2 ~ h3 .section-number:before {
+        content: counter(h2counter) "."
+                        counter(h3counter) ". ";
+    }
+
+    h3 {
+        counter-reset: h4counter;
+        .section-number:before {
+            content: counter(h3counter) ". ";
+            counter-increment: h3counter;
+        }
+        &.notoc .section-number:before {
+            content: none;
+            counter-increment: none;
+        }
+    }
+
+    h1 ~ h2 ~ h3 ~ h4 .section-number:before {
+        content: counter(h1counter) "."
+                        counter(h2counter) "."
+                        counter(h3counter) "."
+                        counter(h4counter) ". ";
+    }
+
+    h2 ~ h3 ~ h4 .section-number:before {
+        content: counter(h2counter) "."
+                        counter(h3counter) "."
+                        counter(h4counter) ". ";
+    }
+
+    h3 ~ h4 .section-number:before {
+        content: counter(h3counter) "."
+                        counter(h4counter) ". ";
+    }
+
+    h4 {
+        counter-reset: h5counter;
+        .section-number:before {
+            content: counter(h4counter) ". ";
+            counter-increment: h4counter;
+        }
+
+        &.notoc .section-number:before {
+            content: none;
+            counter-increment: none;
+        }
+    }
+
+    h1 ~ h2 ~ h3 ~ h4 ~ h5 .section-number:before {
+        content: counter(h1counter) "."
+                        counter(h2counter) "."
+                        counter(h3counter) "."
+                        counter(h4counter) "."
+                        counter(h5counter) ". ";
+    }
+
+    h2 ~ h3 ~ h4 ~ h5 .section-number:before {
+        content: counter(h2counter) "."
+                        counter(h3counter) "."
+                        counter(h4counter) "."
+                        counter(h5counter) ". ";
+    }
+
+    h3 ~ h4 ~ h5 .section-number:before {
+        content: counter(h3counter) "."
+                        counter(h4counter) "."
+                        counter(h5counter) ". ";
+    }
+
+    h4 ~ h5 .section-number:before {
+        content: counter(h4counter) "."
+                        counter(h5counter) ". ";
+    }
+
+    h5 {
+        .section-number:before {
+            content: counter(h5counter) ". ";
+            counter-increment: h5counter;
+        }
+
+        &.notoc .section-number:before {
+            content: none;
+            counter-increment: none;
+        }
+    }
+}
+
+#toc {
+    float:right;
+    display:inline;
+    padding-left: 30pt;
+    padding-bottom: 20pt;
+    padding-top: 1em;
+    background: none;
+    width: 160pt;
+
+    ul, ol {
+        margin-left: 0.3em;
+    }
+
+    .hr {
+        width: 100%;
+        margin: 5pt 0 2pt -20px;
+        border-top: 1px solid #aaa;
+        box-shadow: 0 0 5px 0px rgba(0,0,0,0.1);
+    }
+
+    & > ol {
+        margin-left: -10pt;
+        font-size: 0.9em;
+    }
+
+    ol {
+        counter-reset: item;
+
+        li {
+            display:block;
+
+            &:before {
+                content: counters(item,".") ". ";
+                counter-increment: item;
+            }
+        }
+    }
+
+    &:after {
+        clear: both;
+    }
+}

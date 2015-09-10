@@ -1,0 +1,24 @@
+<nav id="tags-list">
+  <h3>Tags</h3>
+  <div class="hr"></div>
+  <ul>
+    $for(tags_list)$
+    <li>
+      <a href="$url$">$tag$</a> ($refs$)
+    </li>
+    $endfor$
+  </ul>
+</nav>
+
+<div id="post-list">
+  <p>
+    <ul>
+      $for(posts)$
+      <li>
+        <span class="date">$date_archive$</span>
+        <a href="$url$">$title$</a>
+      </li>
+      $endfor$
+    </ul>
+  </p>
+</div>
