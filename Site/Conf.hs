@@ -9,7 +9,7 @@ import System.FilePath
 myDestinationDirectory = "build"
 myStoreDirectory = ".cache"
 myTmpDirectory = ".cache/tmp"
-myDeployCommand = "bash deploy.sh"
+myDeployCommand = "ghp-import -p build"
 myPreviewDirectory = "preview"
 
 myConf = defaultConfiguration {
