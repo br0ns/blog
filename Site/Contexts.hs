@@ -15,20 +15,17 @@ import Data.Monoid (mconcat, mempty, (<>))
 import Data.Maybe
 import Control.Applicative (empty, (<$>))
 import Control.Monad
-import qualified Data.Map as M
 import System.FilePath
 import System.Process
 import Data.List
 import Data.Ord
 import Data.List.Split
 
-import           Data.Time.Clock               (UTCTime (..))
 import           Data.Time.LocalTime           (LocalTime (..))
 import qualified Data.Time.Format              as TF
-import           Data.Time.Locale.Compat       (TimeLocale, defaultTimeLocale)
+import           Data.Time.Locale.Compat       (defaultTimeLocale)
 
 import           Text.Blaze.Html                 (toHtml, toValue, (!))
-import           Text.Blaze.Html.Renderer.String (renderHtml)
 import qualified Text.Blaze.Html5                as H
 import qualified Text.Blaze.Html5.Attributes     as A
 
@@ -158,10 +155,8 @@ tagsNoIndexField =
 
 pageTitleField :: String -> Context String
 pageTitleField k = field k $ \item -> do
-  title <- getMetadataField (itemIdentifier item) "title"
-  return $ case title of
-    Just title -> title ++ " - br0ns"
-    Nothing    -> "br0ns"
+  maybe "br0ns" (++ "- br0ns") <$>
+    getMetadataField (itemIdentifier item) "title"
 
 noIndexUrlField :: String -> Context String
 noIndexUrlField k = field k noIndexUrl

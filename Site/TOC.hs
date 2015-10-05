@@ -13,10 +13,9 @@ import Data.List (groupBy)
 import Data.Tree (Forest, Tree(Node))
 import Data.Monoid ((<>), mconcat)
 import Data.Function (on)
-import Data.Maybe (fromMaybe, maybeToList)
-import Control.Monad
+import Data.Maybe (fromMaybe, maybeToList, isNothing)
 
-import Text.Blaze.Html (preEscapedToHtml, (!), toHtml)
+import Text.Blaze.Html (preEscapedToHtml, (!))
 import Text.Blaze.Html.Renderer.String (renderHtml)
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
@@ -49,11 +48,9 @@ markupTocHeaders = mconcat . map markupTocHeader
 
 markupHeader :: Block -> Block
 markupHeader header@(Header level (ident, classes, keyvals) inline) =
-  case collectHeader header of
-    Nothing -> Header level (ident, "notoc" : classes, keyvals) inline
-    Just _  -> Header level ("", classes, keyvals) $ [
-      RawInline "html" $ renderHtml $ leftof <> anchor <> link
-      ]
+  Header level ("", classes', keyvals) $ [
+    RawInline "html" $ renderHtml $ leftof <> anchor <> link
+    ]
   where render x  = writeHtmlString def (Pandoc nullMeta [(Plain x)])
         section   = render inline
         link      = H.a ! A.href (H.toValue $ "#" ++ ident) $ preEscapedToHtml section
@@ -61,7 +58,9 @@ markupHeader header@(Header level (ident, classes, keyvals) inline) =
         number    = H.span ! A.class_ "section-number" $ ""
         anchor    = H.span ! (A.class_ "anchor" <> A.id (H.toValue ident)) $ ""
         leftof    = H.span ! A.class_ "left-of" $ icon <> number
-
+        classes'  = if isNothing $ collectHeader header
+                    then "notoc" : classes
+                    else classes
 markupHeader x = x
 
 createTable :: Forest Block -> H.Html
@@ -73,7 +72,7 @@ createTable headers =
 
 generateTOC :: [Block] -> Block -> Block
 generateTOC [] x = x
-generateTOC headers x@(BulletList (( (( Plain ((Str "toc"):_)):_)):_)) =
+generateTOC headers (BulletList (( (( Plain ((Str "toc"):_)):_)):_)) =
   render . table $ headers
   where render = (RawBlock "html") . renderHtml
         table  = createTable . groupByHierarchy

@@ -4,14 +4,22 @@ module Site.Conf where
 
 import Hakyll
 
-import System.FilePath
-
+myDestinationDirectory :: String
 myDestinationDirectory = "build"
+
+myStoreDirectory :: String
 myStoreDirectory = ".cache"
+
+myTmpDirectory :: String
 myTmpDirectory = ".cache/tmp"
+
+myDeployCommand :: String
 myDeployCommand = "ghp-import -p build"
+
+myPreviewDirectory :: String
 myPreviewDirectory = "preview"
 
+myConf :: Configuration
 myConf = defaultConfiguration {
   destinationDirectory = myDestinationDirectory,
   storeDirectory       = myStoreDirectory,

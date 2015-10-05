@@ -16,8 +16,6 @@ import qualified Data.ByteString.Char8 as C
 -- Abbreviations
 import Text.Regex (Regex)
 
-import Hakyll (Pattern, Context)
-
 -- the websocket server channels
 type Channels = TVar (Map.Map String (TChan String, Integer))
 

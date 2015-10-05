@@ -13,7 +13,7 @@ import Site.FontAwesome
 import Hakyll
 
 import Text.Pandoc
-import Text.Pandoc.Walk (walkM, query)
+import Text.Pandoc.Walk (walkM)
 
 import Control.Applicative ((<$>))
 import Data.Monoid ((<>))
@@ -27,7 +27,6 @@ import System.Environment
 import Data.Maybe
 import Data.List
 import Data.String
-import Data.Text (Text (..), pack, unpack)
 
 import qualified System.IO.Streams as S
 import System.IO.Streams.Process (runInteractiveProcess)
@@ -35,8 +34,7 @@ import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.UTF8 as U8
 import qualified Data.ByteString as BS
 
-import Data.Text (pack)
-import Text.Blaze.Html (preEscapedToHtml, preEscapedText, (!))
+import Text.Blaze.Html (preEscapedToHtml, (!))
 import Text.Blaze.Html.Renderer.String (renderHtml)
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
@@ -48,7 +46,7 @@ pygmentsServer = do
 
 codeBlocks :: Streams -> Pandoc -> Compiler Pandoc
 codeBlocks streams doc = do
-  (doc, cbs) <- runStateT (walkM (generateCodeBlock streams) doc) []
+  (doc', cbs) <- runStateT (walkM (generateCodeBlock streams) doc) []
   unsafeCompiler $ forM_ cbs $ \(path, CodeBlock _ contents) -> do
     -- Nasty hack.  Why isn't there a Compiler to access the underlying
     -- configuration?
@@ -61,7 +59,7 @@ codeBlocks streams doc = do
     createDirectoryIfMissing True $ takeDirectory path'
     writeFile path' $ contents ++ "\n"
 
-  return doc
+  return doc'
 
 -- TODO: add extension from `pygments.lexers._mappings`
 extensions :: [(String, String)]
@@ -83,7 +81,7 @@ generateCodeBlock streams block@(CodeBlock (ident, classes, keyvals) contents) =
   code <- lift $ pygmentize streams lang kvs contents
 
   blockUrl <- if doDownload then do
-    route <- lift $ (return.takeDirectory.fromJust) =<< getRoute =<< getUnderlying
+    dir <- lift $ (return.takeDirectory.fromJust) =<< getRoute =<< getUnderlying
     n <- gets length
     let ext = maybe "" (\e -> "." ++ e) $ lookup lang extensions
         ident' = if null ident
@@ -91,7 +89,7 @@ generateCodeBlock streams block@(CodeBlock (ident, classes, keyvals) contents) =
                  else if hasExtension ident
                       then ident
                       else addExtension ident ext
-        blockPath = route </> ident'
+        blockPath = dir </> ident'
     modify $ (:) (blockPath, block)
     return $ toUrl blockPath
                else return ""

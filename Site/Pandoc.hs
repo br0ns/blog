@@ -13,8 +13,6 @@ import Site.TOC
 
 import Text.Pandoc
 import Text.Pandoc.Walk (walk)
-import Data.Maybe (fromMaybe)
-import Control.Monad
 
 import Hakyll hiding (pandocCompiler)
 
