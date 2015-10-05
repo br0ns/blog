@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="all,index,follow">
 
-  <title>0ctf 2015: "r0ops" (Reverse 150) - br0ns</title>
+  <title>0ctf 2015: "r0ops" (Reverse 150)- br0ns</title>
 
   <link href="http://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">
@@ -666,7 +666,7 @@
 \]</span></p>
 <p>Split the input into qwords, <span class="math inline">\(y_1, ..., y_8\)</span>. For each <span class="math inline">\(y_i\)</span> <a href="http://en.wikipedia.org/wiki/Exponentiation_by_squaring">exponentiation by squaring</a> is used to compute <span class="math inline">\(y_{i}^{13337}\)</span>.</p>
 <p>If <span class="math inline">\(y_{i}^{13337} = x_i\)</span> for <span class="math inline">\(i = 1, ..., 8\)</span> the win-function is called. Easy-peasy.</p>
-<h4 id="team-member-kriztw-solved-this-part" class="notoc">Team member kriztw solved this part:</h4>
+<h4 class="notoc"><span class="left-of"><span class="link-icon"><i class="fa fa-link"></i></span><span class="section-number"></span></span><span class="anchor" id="team-member-kriztw-solved-this-part"></span><a href="../../../posts/0ctf/r0ops/#team-member-kriztw-solved-this-part">Team member kriztw solved this part:</a></h4>
 <p>Because register values wrap around, computation effectively happens modulo <span class="math inline">\(2^{64}\)</span>.</p>
 <p>By <a href="http://en.wikipedia.org/wiki/Euler%27s_theorem">Euler’s theorem</a> we have that <span class="math inline">\(a^{\phi(n)} \equiv 1 \mod n\)</span>, so if we can find <span class="math inline">\(d \equiv 13337^{-1} \mod \phi(n)\)</span> we will have <span class="math inline">\(x_{i}^{d} = (y_{i}^{13337})^d = y_{i}^{13337 \cdot d} = y_{i}^1 = y_i\)</span>.</p>
 <p>Every odd number is relatively prime to <span class="math inline">\(2^{64}\)</span> so <span class="math inline">\(\phi(2^{64})\)</span> is <span class="math inline">\(2^{63}\)</span>. And here’s the program:</p>
@@ -689,7 +689,40 @@
 
 <br />
 
-(<a href="../../../posts/0ctf/r0ops">To top</a>)
+<center>
+  (<a href="../../../posts/0ctf/r0ops">To top</a>)
+</center>
+
+<br />
+
+<h1 class="notoc">
+  <span class="left-of">
+    <span class="link-icon">
+      <i class="fa fa-link"></i>
+    </span>
+    <span class="section-number">
+    </span>
+  </span>
+  <span class="anchor" id="comments">
+  </span>
+  <a href="../../../posts/0ctf/r0ops/#comments">
+    Comments
+  </a>
+</h1>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'br0ns';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
   </article>
 
