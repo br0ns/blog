@@ -7,3 +7,4 @@ preview
 site
 .cabal-sandbox
 cabal.sandbox.config
+dist
