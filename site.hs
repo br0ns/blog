@@ -2,16 +2,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE LambdaCase #-}
 
-import Data.Monoid ((<>), mappend)
+import Data.Monoid ((<>), mempty)
 import GHC.IO.Encoding
 import System.FilePath
-import Data.Monoid (mconcat, (<>))
 import Data.List
 import Data.Char
-import Site.Contexts
-import System.FilePath
 import System.Environment
-import Control.Monad.Trans
 import Control.Monad
 import Control.Concurrent
 
@@ -46,9 +42,11 @@ main = do
           }
         else myConf
       compileContents tpl ctx compiler = do
-        let indexRoute = customRoute $ \case
-              "404.html" -> "404.html"
-              ident      -> (dropExtension $ toFilePath ident) ++ "/index.html"
+        let indexRoute = customRoute $ \ident ->
+              let path = toFilePath ident
+              in if takeExtension path == ".html"
+                 then path
+                 else (++ "/index.html") $ dropExtension path
             ctx' = ctx <> liveEditJSField "live_edit_js" watch
 
         route   $ baseRoute `composeRoutes` indexRoute
@@ -71,6 +69,7 @@ main = do
     let postsPattern = if watch
                        then "posts/**.md" .||. "drafts/**.md"
                        else "posts/**.md"
+        pagesPattern = "pages/**.md" .&&. complement "pages/404.md"
 
     -- Style sheets
     match "css/*.css" $ do
@@ -99,13 +98,14 @@ main = do
         route   baseRoute
         compile copyFileCompiler
 
-    let pandocCompiler = pandocCustomCompiler streams
+    let contentCompiler = pandocCustomCompiler streams
 
     -- Compile all markdown
+
     match postsPattern $
-      compileContents "post" (postCtx tags) pandocCompiler
-    match "pages/**.md" $
-      compileContents "page" defaultCtx pandocCompiler
+      compileContents "post" (postCtx tags) contentCompiler
+    match pagesPattern $
+      compileContents "page" defaultCtx contentCompiler
 
     -- Create archive
     create ["tags/all"] $
@@ -115,14 +115,17 @@ main = do
       compileContents "tags" (archiveCtx pattern tags $ Just tag) (makeItem "")
 
     -- 404 page
-    create ["404.html"] $
-      compileContents "404"
-      (constField "page_title" "Not found - br0ns" <>
-       constField "title" "404" <>
-       constField "byline" "Not found" <>
-       constField "url" "/" <>
-       bodyField  "body"
-      ) (makeItem "")
+    match "pages/404.md" $ do
+      compileContents "page" defaultCtx contentCompiler
+      -- Override route; created below
+      route mempty
+
+    -- The 404 page may be accessed from any path, so we need absolute urls
+    create ["404.html"] $ do
+      route idRoute
+      compile $
+        (makeItem =<< loadSnapshotBody "pages/404.md" "absolute_urls" ::
+            Compiler (Item String))
 
     -- Put the latest post on the front page
     create ["index.html"] $ do
@@ -130,7 +133,8 @@ main = do
       compile $ do
         posts <- recentGitFirst postsPattern
         let post = head posts
-        (body :: String) <- loadSnapshotBody (itemIdentifier post) "absolute_urls"
+            ident = itemIdentifier post
+        (body :: String) <- loadSnapshotBody ident "absolute_urls"
         relativizeUrls =<< makeItem body
 
 baseRoute :: Routes
@@ -142,15 +146,13 @@ canonName = intercalate "-" . words . map (\x -> if x `elem` allowedChars
                                                  else ' ')
   where allowedChars = ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ " "
 
--- compileContents :: String -> Context String -> Compiler (Item String) -> Rules()
-
 absolutizeUrls :: Item String -> Compiler (Item String)
 absolutizeUrls item = do
-    route <- getRoute $ itemIdentifier item
-    return $ case route of
+    mbroute <- getRoute $ itemIdentifier item
+    return $ case mbroute of
         Nothing -> item
-        Just r  -> fmap (withUrls abs) item
-          where abs url = if isAbs url
+        Just r  -> fmap (withUrls absolutize) item
+          where absolutize url = if isAbs url
                           then url
                           else "/" ++ takeDirectory r </> url
                 isAbs url = "://" `isInfixOf` url || "/" `isPrefixOf` url
