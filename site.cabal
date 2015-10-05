@@ -1,0 +1,32 @@
+name:             br0ns-blog
+version:          1.0
+build-type:       Simple
+cabal-version:    >=1.2
+
+executable site
+  hs-source-dirs: .
+  main-is:        site.hs
+  ghc-options:    -O2 -Wall -threaded
+  build-depends:  base
+                , blaze-html
+                , text
+                , bytestring
+                , utf8-string
+                , io-streams
+                , filepath
+                , directory
+                , mtl
+                , pandoc-types
+                , pandoc
+                , unix
+                , hakyll
+                , regex-tdfa
+                , regex-compat-tdfa
+                , stm
+                , containers
+                , websockets
+                , transformers
+                , time-locale-compat
+                , time
+                , split
+                , process
