@@ -4,6 +4,11 @@
     h1, h2, h3, h4, h5 {
         position: relative;
 
+        /* Extend the clickable area all the way to the right */
+        a {
+            display: block;
+        }
+
         .left-of {
             position: absolute;
             left: -50pt;
@@ -13,7 +18,7 @@
         .link-icon {
             visibility: hidden;
             color: $color-link-light;
-            font-size: 70%;
+            font-size: 1.3rem;
             padding-right: 0.5em;
             text-shadow: 0 0 1px rgba(0,0,0,0.2);
         }
@@ -24,7 +29,6 @@
 
         .section-number {
             font-size: 50%;
-            /* text-decoration: underline; */
             color: #444;
         }
 
@@ -161,42 +165,35 @@
 #toc {
     float:right;
     display:inline;
-    padding-left: 30pt;
-    padding-bottom: 20pt;
-    padding-top: 1em;
-    background: none;
-    width: 160pt;
+    margin: 0 0 1em 2em;
 
-    ul, ol {
-        margin-left: 0.3em;
+    h3 {
+        margin: 0 2em;
     }
 
     .hr {
         width: 100%;
-        margin: 5pt 0 2pt -20px;
+        margin: 5pt 0 2pt 0;
         border-top: 1px solid #aaa;
         box-shadow: 0 0 5px 0px rgba(0,0,0,0.1);
     }
 
-    & > ol {
-        margin-left: -10pt;
-        font-size: 0.9em;
-    }
-
-    ol {
+    ul, ol {
+        font-size: 90%;
+        margin: 0;
+        margin-left: 1em;
         counter-reset: item;
 
         li {
-            display:block;
-
+            list-style-type: none;
+            position: relative;
             &:before {
-                content: counters(item,".") ". ";
+                margin: 0;
+                position: relative;
+                left: 0em;
                 counter-increment: item;
+                content: counters(item,".") ". ";
             }
         }
-    }
-
-    &:after {
-        clear: both;
     }
 }
