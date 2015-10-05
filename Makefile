@@ -16,5 +16,8 @@ clean:
 watch:
 	./site watch
 
+build:
+	./site build
+
 deploy:
 	./site deploy
