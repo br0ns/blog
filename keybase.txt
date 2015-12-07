@@ -1,0 +1,73 @@
+==================================================================
+https://keybase.io/br0ns
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://br0ns.dk
+  * I am br0ns (https://keybase.io/br0ns) on keybase.
+  * I have a public key with fingerprint 4A72 02F7 B607 CD7D 0BD4  49AA C930 9A6E 751D B475
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "01012a5ae5242a9f395afc88790499f51043d4e02e87b40e28e413fcfc808b69b2410a",
+            "fingerprint": "4a7202f7b607cd7d0bd449aac9309a6e751db475",
+            "host": "keybase.io",
+            "key_id": "c9309a6e751db475",
+            "kid": "01012a5ae5242a9f395afc88790499f51043d4e02e87b40e28e413fcfc808b69b2410a",
+            "uid": "9fd3290c978bf4540adc966b61a2d519",
+            "username": "br0ns"
+        },
+        "service": {
+            "hostname": "br0ns.dk",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1449516274,
+    "expire_in": 157680000,
+    "prev": "3a1124b17ea06b2e74df48bcadbfc9627b363f509d2e14fcdf290cf5abe8a76b",
+    "seqno": 3,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1
+
+owGtUn1MVWUcvlyQgCKvXBcYH8XJCpOP833uuRooShg4wybUEnZ933PegwfknNv9
+QJBdt6g5QPzIBE3KaAvUscUkXLQuVCBtfPiBAil60RzlbhRGSjUubp3DauuP/uz9
+5937e5/n+T3Pb7/DkcEGY9AAfkJxx3e6g4b80FCAfCFVGFTFSsxahZWixQvtEpHT
+ZSuVRcyK4QROkIABiCFpEvASxTNAEiwWjsdpnpcYAqcpkUY4iSwcpHFEWhBNUJKg
+YXALZHlI0gQOsGRMkpVi5LA7ZMWlydKAI3FS4iCLc4LIiTgUaZoHQOApnAcs4hhC
+hDTHaMSdqlNnaOYgcKJUWdVq2sO2aO8/8P+zb/eiHC+JFMnjAs9ZoEQzNA5EgWdZ
+yBKAFBmC14FO5FBAGdLQ0IErTsyTjGmlcllA+lT1GP/+ThVLNZLdobpUQd2lVXe6
+XHarTnJV2nXUbgRtf/NtUFZEbX4aoRw5nLKqYFZCQwouWRcktNExBEtydDKGKuyy
+A9lkHcFwrAXXjt4GlWuSFCAIkoYEhwDOQjIPcbQo0RYoABFKWh6SgxRLSQzOiyQi
+aEkQJT20xACILIBjIaZHelNRMSul+QTFmqZTLlaAy+1AmCei1hgXYggyGkKXGPXN
+MkSEm/5Zt4ZMk6FPVkui9kaGeFo7ay++mz23Pe+bxGDikP9lm7lZqP2pRLpVXHgv
+LyHQNJ76vfySOnxu/H3r6rBPc2+Xj214e0x0bn2YUvvMkbZT6T+HuTcHkvf536rY
+37Zxdse2F1OUa7M583XyzajpQf+90LgO41h7ZHZ/ren47rnuM9TXm2oiN036z/YH
++pXPTmT88Encla9y1042ky2+0ULlTHeMdeWtikHq9+bSxxoXelYNC0WX+qptuTUJ
+j796/ezUkHfqUkroQXn1EjifEQhfPwm2+u5m2dT+p470DH73Ud8V3Pxgm6dmZSD8
+elJLycS6q43rzeRrxhuu6fqTcSHZsV7mzvyWD+JOHrxz7cCKyxvP3718NG84N8xb
+vWHf0dYs8X767ERqwTsD452/XJh5fWj51WWjfru0J813w3f+267c+Feow3vASG9+
+z+ddk2LMox+nZS5t3JxyYbpsJnPhSb+Rja2nlzYFkg+0Jda3h62x1MU/fGJk2cgb
+2HTk7Klof/tEcHUalwbgmqTtxpG2DjR+em9NhgdraVuXdr939rflObaoF75oNT2X
+cLuwLKaogbtoivhzrs6TJ+0wbyn4MTHr+bVFX3rz+fmBhmMPTCKekT51KKfSfFPp
+mkuaXFHlzXL/8aGzqffXjnMTrWPPRnXz7keeXjXTZTzeGDvaMXzal88l+rqij9kX
+1Oj3/gI=
+=iNVH
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/br0ns
+
+==================================================================
