@@ -66,9 +66,10 @@ main = do
 
   hakyllWith conf $ do
 
-    let postsPattern = if watch
-                       then "posts/**.md" .||. "drafts/**.md"
-                       else "posts/**.md"
+    let postsDir = if watch
+                   then "posts/**" .||. "drafts/**"
+                   else "posts/**"
+        postsPattern = postsDir .&&. "**.md"
         pagesPattern = "pages/**.md" .&&. complement "pages/404.md"
 
     -- Style sheets
@@ -93,7 +94,7 @@ main = do
     tags <- buildTags postsPattern (fromCapture "tags/*" . canonName)
 
     -- Copy everything as a "raw" version
-    match ("posts/**" .||. "pages/**" .||. "static/**") $
+    match (postsDir .||. "pages/**" .||. "static/**") $
       version "raw" $ do
         route   baseRoute
         compile copyFileCompiler
