@@ -1,5 +1,6 @@
 ---
-title: 0ctf 2015: "r0ops" (Reverse 150)
+title: 0ctf 2015: "r0ops"
+byline: Points: 150, Category: reverse
 tags: Writeups, IDA Pro
 ---
 
