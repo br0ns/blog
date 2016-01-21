@@ -8,6 +8,7 @@ import Hakyll
 
 jsCompiler :: Compiler (Item String)
 jsCompiler = do
-  p <- getResourceFilePath
-  body <- unixFilter "closure-compiler" [p] ""
-  makeItem body
+  -- p <- getResourceFilePath
+  -- body <- unixFilter "closure-compiler" [p] ""
+  -- makeItem body
+  getResourceBody

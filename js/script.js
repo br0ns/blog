@@ -14,8 +14,12 @@ function copy_to_clipboard(element) {
         .end()
         .text();
     temp.val(code).select();
-    document.execCommand("copy");
-    temp.remove();
+    try {
+        document.execCommand("copy");
+    }
+    finally {
+        temp.remove();
+    }
 }
 
 $(document).ready(function(){
@@ -81,5 +85,12 @@ $(document).ready(function(){
                 }
             });
     });
+
+    // Let "To top" link scroll the page instead of reloading
+    $("#link-to-top")
+        .click(function (e) {
+            e.preventDefault();
+            window.scroll(0, 0);
+        });
 
 });

@@ -18,6 +18,7 @@ import Text.Pandoc.Walk (walkM)
 import Control.Applicative ((<$>))
 import Data.Monoid ((<>))
 import Control.Monad
+import Control.Monad.Catch
 import Control.Monad.State
 
 import System.Directory
@@ -130,7 +131,8 @@ pygmentize (os, is) lang keyvals contents = unsafeCompiler $ do
       -- REQUEST:  LANG\nLENGTH\nCODE
       request = C.intercalate "\n" [lang', keyvals', len, contents']
 
-  mapM_ (flip S.write os . Just) [request, ""]
+  mapM_ (flip S.write os . Just) [request, ""] `catchIOError`
+    \_ -> fail "pygments-server is not running"
 
   -- RESPONSE: LENGTH\nRESPONSE
   responseLength <- read . U8.toString . fromJust <$> (S.lines >=> S.read) is

@@ -10,16 +10,19 @@
 }
 
 #title {
-    font-size: 300%;
+    font-size: $size-title;
     font-family: $font-title;
+    font-weight: $weight-title;
     color: $color-title;
 }
 
 #byline {
-    color: $color-byline;
-    margin-left: 30pt;
-    font-weight: bold;
+    font-size: $size-byline;
     font-family: $font-byline;
+    font-weight: $weight-byline;
+    color: $color-byline;
+
+    margin-left: 30pt;
 }
 
 #navbar {

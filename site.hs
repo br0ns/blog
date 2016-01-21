@@ -102,7 +102,6 @@ main = do
     let contentCompiler = pandocCustomCompiler streams
 
     -- Compile all markdown
-
     match postsPattern $
       compileContents "post" (postCtx tags) contentCompiler
     match pagesPattern $

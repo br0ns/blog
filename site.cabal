@@ -9,24 +9,25 @@ executable site
   ghc-options:    -O2 -Wall -threaded
   build-depends:  base
                 , blaze-html
-                , text
                 , bytestring
-                , utf8-string
-                , io-streams
-                , filepath
-                , directory
-                , mtl
-                , pandoc-types
-                , pandoc
-                , unix
-                , hakyll
-                , regex-tdfa
-                , regex-compat-tdfa
-                , stm
                 , containers
-                , websockets
-                , transformers
-                , time-locale-compat
-                , time
-                , split
+                , directory
+                , exceptions
+                , filepath
+                , hakyll
+                , io-streams
+                , mtl
+                , pandoc
+                , pandoc-types
                 , process
+                , regex-compat-tdfa
+                , regex-tdfa
+                , split
+                , stm
+                , text
+                , time
+                , time-locale-compat
+                , transformers
+                , unix
+                , utf8-string
+                , websockets

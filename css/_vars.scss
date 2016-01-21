@@ -12,13 +12,20 @@ $color-figure-background: #f8f8f8;
 $color-code-background:   #eee;
 $color-text:              #202020;
 
-$font-title:              "Oswald", Arial, sans-serif;
-$font-byline:             "Quicksand", Arial, sans-serif;
+$font-default:            "Crimson Text", "EB Garamond", serif;
+$font-code:               "Inconsolata", monospace;
+
+$font-title:              "Oswald";
+$size-title:              400%;
+$weight-title:            normal;
+
+$font-byline:             $font-default;
+$size-byline:             100%;
+$weight-byline:           normal;
+
 $font-meta:               "Josefin Sans", Arial, sans-serif;
 $font-navbar:             "Quicksand", Arial, sans-serif;
 $font-heading:            "Quicksand", Arial, sans-serif;
-$font-code:               "Inconsolata", monospace;
-$font-default:            "Crimson Text", "EB Garamond", serif;
 
 $content-width:           800px;
 $figure-margin:           30px;

@@ -1,23 +1,23 @@
 all: site
 
-.PHONY: site clean watch deploy
+.PHONY: clean watch build deploy
 
-site:
+site: site.hs Site
 	if [ ! -d .cabal-sandbox ] ; then \
 	  cabal sandbox init; \
-	  cabal install --only-dependencies; \
+	  while ! cabal install --only-dependencies ; do :; done; \
 	fi
 	cabal build
 	cabal install --bindir=.
 
-clean:
+clean: site
 	./site clean
 
-watch:
+watch: site
 	./site watch
 
-build:
+build: site
 	./site build
 
-deploy:
+deploy: site
 	./site deploy
