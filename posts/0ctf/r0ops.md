@@ -576,8 +576,8 @@ win();
 This code computes a series as:
 
 $$
-    x^0 = \tt{0x1337deadbeef0095} \\
-    x^n = x^{n-1} \cdot \tt{0xcafe} + \tt{0xbeef}
+    x_0 = \tt{0x1337deadbeef0095} \\
+    x_n = x_{n-1} \cdot \tt{0xcafe} + \tt{0xbeef}
 $$
 
 Split the input into qwords, $y_1, ..., y_8$.  For each $y_i$
