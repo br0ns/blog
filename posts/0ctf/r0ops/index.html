@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="all,index,follow">
 
-  <title>0ctf 2015: "r0ops" (Reverse 150)- br0ns</title>
+  <title>0ctf 2015: "r0ops"- br0ns</title>
 
   <link href="http://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">
@@ -46,10 +46,14 @@
   <div id="header">
     <div id="title">
       <a href="../../../posts/0ctf/r0ops">
-        0ctf 2015: "r0ops" (Reverse 150)
+        0ctf 2015: "r0ops"
       </a>
     </div>
 
+    
+    <div id="byline">
+      Points: 150, Category: reverse
+    </div>
     
 
     
@@ -57,17 +61,20 @@
       <ul>
         <li>
           
+          <span title="Edited 2016-01-21 16:51:35">
+            <i class="fa fa-calendar"></i>&nbsp;
+            September 10, 2015
+            
 
             
-          <i class="fa fa-calendar"></i>&nbsp;
-          September 10, 2015
+          </span>
           
         </li>
 
         <li>
           <i class="fa fa-code-fork"></i>&nbsp;
-          <a href="https://github.com/br0ns/blog/commit/82cd1b1c96e0530c5164006cd4fb86e20572434a" title="View on GitHub">
-            82cd1b1&hellip;
+          <a href="https://github.com/br0ns/blog/commit/af34f136592036064145fcef8fa761cdd81d5af3" title="View on GitHub">
+            af34f13&hellip;
           </a>
         </li>
 
@@ -152,38 +159,38 @@
 </span><span id="line-3"><span class="lineno"> 3 </span><span class="kn">from</span> <span class="nn">idc</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="line-4"><span class="lineno"> 4 </span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
 </span><span id="line-5"><span class="lineno"> 5 </span>
-</span><span id="line-6"><span class="lineno"> 6 </span><span class="c"># IDA does something to fd 1 and 2</span>
+</span><span id="line-6"><span class="lineno"> 6 </span><span class="c1"># IDA does something to fd 1 and 2</span>
 </span><span id="line-7"><span class="lineno"> 7 </span><span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-</span><span id="line-8"><span class="lineno"> 8 </span>    <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="s">'</span><span class="si">%s</span><span class="se">\n</span><span class="s">'</span> <span class="o">%</span> <span class="n">s</span><span class="p">)</span>
+</span><span id="line-8"><span class="lineno"> 8 </span>    <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="s1">'</span><span class="si">%s</span><span class="se">\n</span><span class="s1">'</span> <span class="o">%</span> <span class="n">s</span><span class="p">)</span>
 </span><span id="line-9"><span class="lineno"> 9 </span>
 </span><span id="line-10"><span class="lineno">10 </span><span class="n">rsp</span> <span class="o">=</span> <span class="mh">0xe0b08a0</span>
 </span><span id="line-11"><span class="lineno">11 </span><span class="n">program</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="line-12"><span class="lineno">12 </span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
 </span><span id="line-13"><span class="lineno">13 </span>    <span class="n">addr</span> <span class="o">=</span> <span class="n">Qword</span><span class="p">(</span><span class="n">rsp</span><span class="p">)</span>
-</span><span id="line-14"><span class="lineno">14 </span>    <span class="n">line</span> <span class="o">=</span> <span class="s">'0x</span><span class="si">%08x</span><span class="s"> -&gt; '</span> <span class="o">%</span> <span class="n">rsp</span>
+</span><span id="line-14"><span class="lineno">14 </span>    <span class="n">line</span> <span class="o">=</span> <span class="s1">'0x</span><span class="si">%08x</span><span class="s1"> -&gt; '</span> <span class="o">%</span> <span class="n">rsp</span>
 </span><span id="line-15"><span class="lineno">15 </span>    <span class="n">rsp</span> <span class="o">+=</span> <span class="mi">8</span>
-</span><span id="line-16"><span class="lineno">16 </span>    <span class="c"># Looks like all gadgets start on a jump</span>
+</span><span id="line-16"><span class="lineno">16 </span>    <span class="c1"># Looks like all gadgets start on a jump</span>
 </span><span id="line-17"><span class="lineno">17 </span>    <span class="n">jmp</span> <span class="o">=</span> <span class="n">DecodeInstruction</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
-</span><span id="line-18"><span class="lineno">18 </span>    <span class="c"># Not a pointer: The &quot;stack&quot; is probably exhausted</span>
+</span><span id="line-18"><span class="lineno">18 </span>    <span class="c1"># Not a pointer: The &quot;stack&quot; is probably exhausted</span>
 </span><span id="line-19"><span class="lineno">19 </span>    <span class="k">if</span> <span class="n">jmp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
 </span><span id="line-20"><span class="lineno">20 </span>        <span class="k">break</span>
-</span><span id="line-21"><span class="lineno">21 </span>    <span class="k">assert</span> <span class="n">jmp</span><span class="o">.</span><span class="n">get_canon_mnem</span><span class="p">()</span> <span class="o">==</span> <span class="s">'jmp'</span>
+</span><span id="line-21"><span class="lineno">21 </span>    <span class="k">assert</span> <span class="n">jmp</span><span class="o">.</span><span class="n">get_canon_mnem</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'jmp'</span>
 </span><span id="line-22"><span class="lineno">22 </span>    <span class="n">addr</span> <span class="o">=</span> <span class="n">jmp</span><span class="o">.</span><span class="n">Op1</span><span class="o">.</span><span class="n">addr</span>
 </span><span id="line-23"><span class="lineno">23 </span>    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
 </span><span id="line-24"><span class="lineno">24 </span>        <span class="n">size</span> <span class="o">=</span> <span class="n">MakeCode</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
 </span><span id="line-25"><span class="lineno">25 </span>        <span class="k">assert</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span>
 </span><span id="line-26"><span class="lineno">26 </span>        <span class="n">mnem</span> <span class="o">=</span> <span class="n">GetMnem</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
-</span><span id="line-27"><span class="lineno">27 </span>        <span class="n">line</span> <span class="o">+=</span> <span class="s">'0x</span><span class="si">%08x</span><span class="s">: </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">GetDisasm</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
-</span><span id="line-28"><span class="lineno">28 </span>        <span class="k">if</span>   <span class="n">mnem</span> <span class="o">==</span> <span class="s">'retn'</span><span class="p">:</span>
+</span><span id="line-27"><span class="lineno">27 </span>        <span class="n">line</span> <span class="o">+=</span> <span class="s1">'0x</span><span class="si">%08x</span><span class="s1">: </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">GetDisasm</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+</span><span id="line-28"><span class="lineno">28 </span>        <span class="k">if</span>   <span class="n">mnem</span> <span class="o">==</span> <span class="s1">'retn'</span><span class="p">:</span>
 </span><span id="line-29"><span class="lineno">29 </span>            <span class="k">break</span>
-</span><span id="line-30"><span class="lineno">30 </span>        <span class="k">elif</span> <span class="n">mnem</span> <span class="o">==</span> <span class="s">'pop'</span><span class="p">:</span>
-</span><span id="line-31"><span class="lineno">31 </span>            <span class="n">line</span> <span class="o">+=</span> <span class="s">' ;; </span><span class="si">%d</span><span class="s">'</span> <span class="o">%</span> <span class="n">Qword</span><span class="p">(</span><span class="n">rsp</span><span class="p">)</span>
+</span><span id="line-30"><span class="lineno">30 </span>        <span class="k">elif</span> <span class="n">mnem</span> <span class="o">==</span> <span class="s1">'pop'</span><span class="p">:</span>
+</span><span id="line-31"><span class="lineno">31 </span>            <span class="n">line</span> <span class="o">+=</span> <span class="s1">' ;; </span><span class="si">%d</span><span class="s1">'</span> <span class="o">%</span> <span class="n">Qword</span><span class="p">(</span><span class="n">rsp</span><span class="p">)</span>
 </span><span id="line-32"><span class="lineno">32 </span>            <span class="n">rsp</span> <span class="o">+=</span> <span class="mi">8</span>
 </span><span id="line-33"><span class="lineno">33 </span>        <span class="n">addr</span> <span class="o">+=</span> <span class="n">size</span>
 </span><span id="line-34"><span class="lineno">34 </span>        <span class="n">program</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-</span><span id="line-35"><span class="lineno">35 </span>        <span class="n">line</span> <span class="o">=</span> <span class="s">' '</span> <span class="o">*</span> <span class="mi">14</span>
+</span><span id="line-35"><span class="lineno">35 </span>        <span class="n">line</span> <span class="o">=</span> <span class="s1">' '</span> <span class="o">*</span> <span class="mi">14</span>
 </span><span id="line-36"><span class="lineno">36 </span>
-</span><span id="line-37"><span class="lineno">37 </span><span class="n">info</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">program</span><span class="p">))</span>
+</span><span id="line-37"><span class="lineno">37 </span><span class="n">info</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">program</span><span class="p">))</span>
 </span><span id="line-38"><span class="lineno">38 </span>
 </span><span id="line-39"><span class="lineno">39 </span><span class="nb">exit</span><span class="p">()</span>
 </span></pre></div>
@@ -661,8 +668,8 @@
 </figure></div>
 <p>This code computes a series as:</p>
 <p><span class="math display">\[
-    x^0 = \tt{0x1337deadbeef0095} \\
-    x^n = x^{n-1} \cdot \tt{0xcafe} + \tt{0xbeef}
+    x_0 = \tt{0x1337deadbeef0095} \\
+    x_n = x_{n-1} \cdot \tt{0xcafe} + \tt{0xbeef}
 \]</span></p>
 <p>Split the input into qwords, <span class="math inline">\(y_1, ..., y_8\)</span>. For each <span class="math inline">\(y_i\)</span> <a href="http://en.wikipedia.org/wiki/Exponentiation_by_squaring">exponentiation by squaring</a> is used to compute <span class="math inline">\(y_{i}^{13337}\)</span>.</p>
 <p>If <span class="math inline">\(y_{i}^{13337} = x_i\)</span> for <span class="math inline">\(i = 1, ..., 8\)</span> the win-function is called. Easy-peasy.</p>
@@ -690,7 +697,7 @@
 <br />
 
 <center>
-  (<a href="../../../posts/0ctf/r0ops">To top</a>)
+  (<a id="link-to-top" href="../../../posts/0ctf/r0ops">To top</a>)
 </center>
 
 <br />

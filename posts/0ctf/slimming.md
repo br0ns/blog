@@ -1,5 +1,6 @@
 ---
-title: 0ctf 2015: "slimming" (Reverse 200)
+title: 0ctf 2015: "slimming"
+byline: Points: 200, Category: reverse
 tags: Writeups
 ---
 

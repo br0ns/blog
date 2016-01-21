@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="all,index,follow">
 
-  <title>0ctf 2015: "slimming" (Reverse 200)- br0ns</title>
+  <title>0ctf 2015: "slimming"- br0ns</title>
 
   <link href="http://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">
@@ -46,10 +46,14 @@
   <div id="header">
     <div id="title">
       <a href="./posts/0ctf/slimming">
-        0ctf 2015: "slimming" (Reverse 200)
+        0ctf 2015: "slimming"
       </a>
     </div>
 
+    
+    <div id="byline">
+      Points: 200, Category: reverse
+    </div>
     
 
     
@@ -57,17 +61,20 @@
       <ul>
         <li>
           
+          <span title="Edited 2016-01-21 16:51:35">
+            <i class="fa fa-calendar"></i>&nbsp;
+            September 10, 2015
+            
 
             
-          <i class="fa fa-calendar"></i>&nbsp;
-          September 10, 2015
+          </span>
           
         </li>
 
         <li>
           <i class="fa fa-code-fork"></i>&nbsp;
-          <a href="https://github.com/br0ns/blog/commit/82cd1b1c96e0530c5164006cd4fb86e20572434a" title="View on GitHub">
-            82cd1b1&hellip;
+          <a href="https://github.com/br0ns/blog/commit/af34f136592036064145fcef8fa761cdd81d5af3" title="View on GitHub">
+            af34f13&hellip;
           </a>
         </li>
 
@@ -158,9 +165,9 @@
 <div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet2.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="line-2"><span class="lineno">2 </span>
 </span><span id="line-3"><span class="lineno">3 </span><span class="k">def</span> <span class="nf">blackbox</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-</span><span id="line-4"><span class="lineno">4 </span>    <span class="n">write</span><span class="p">(</span><span class="s">'/tmp/foo'</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-</span><span id="line-5"><span class="lineno">5 </span>    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">'./slimming /tmp/foo /tmp/bar &gt;/dev/null'</span><span class="p">)</span>
-</span><span id="line-6"><span class="lineno">6 </span>    <span class="k">return</span> <span class="n">read</span><span class="p">(</span><span class="s">'/tmp/bar'</span><span class="p">)</span>
+</span><span id="line-4"><span class="lineno">4 </span>    <span class="n">write</span><span class="p">(</span><span class="s1">'/tmp/foo'</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</span><span id="line-5"><span class="lineno">5 </span>    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">'./slimming /tmp/foo /tmp/bar &gt;/dev/null'</span><span class="p">)</span>
+</span><span id="line-6"><span class="lineno">6 </span>    <span class="k">return</span> <span class="n">read</span><span class="p">(</span><span class="s1">'/tmp/bar'</span><span class="p">)</span>
 </span></pre></div>
 </figure></div>
 <p>Tradition dictates that I must now trow A’s at it:</p>
@@ -216,13 +223,13 @@
 </ul>
 <p>There’s a pattern here: For <em>n</em> pairs the number of A’s encoded by the first <em>n - 1</em> pairs is <em>1 + … + n - 1 = T<sub>n-1</sub></em> and the last pair then encodes a literal A.</p>
 <p>Now we can recover the first, say 100, bytes of the xor stream:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet5.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">stream</span> <span class="o">=</span> <span class="s">''</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet5.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">stream</span> <span class="o">=</span> <span class="s1">''</span>
 </span><span id="line-2"><span class="lineno">2 </span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">51</span><span class="p">):</span>
-</span><span id="line-3"><span class="lineno">3 </span>    <span class="c"># T_(n-1) in closed form</span>
+</span><span id="line-3"><span class="lineno">3 </span>    <span class="c1"># T_(n-1) in closed form</span>
 </span><span id="line-4"><span class="lineno">4 </span>    <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span id="line-5"><span class="lineno">5 </span>    <span class="n">t</span> <span class="o">=</span> <span class="n">blackbox</span><span class="p">(</span><span class="s">'A'</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span>
+</span><span id="line-5"><span class="lineno">5 </span>    <span class="n">t</span> <span class="o">=</span> <span class="n">blackbox</span><span class="p">(</span><span class="s1">'A'</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span>
 </span><span id="line-6"><span class="lineno">6 </span>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
-</span><span id="line-7"><span class="lineno">7 </span>    <span class="n">stream</span> <span class="o">+=</span> <span class="n">xor</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:],</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span><span id="line-7"><span class="lineno">7 </span>    <span class="n">stream</span> <span class="o">+=</span> <span class="n">xor</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:],</span> <span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </span><span id="line-8"><span class="lineno">8 </span><span class="k">print</span> <span class="n">hexdump</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
 </span></pre></div>
 </figure></div>
@@ -242,7 +249,7 @@
 </span><span id="line-2"><span class="lineno">2 </span>    <span class="n">stream</span> <span class="o">=</span> <span class="p">[</span><span class="mi">207</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">171</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">173</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span>
 </span><span id="line-3"><span class="lineno">3 </span>              <span class="mi">152</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">109</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">186</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 </span><span id="line-4"><span class="lineno">4 </span>    <span class="n">t</span> <span class="o">=</span> <span class="n">blackbox</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">4</span><span class="p">:]</span>
-</span><span id="line-5"><span class="lineno">5 </span>    <span class="k">return</span> <span class="n">ordlist</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">cut</span> <span class="o">=</span> <span class="s">'left'</span><span class="p">))</span>
+</span><span id="line-5"><span class="lineno">5 </span>    <span class="k">return</span> <span class="n">ordlist</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">cut</span> <span class="o">=</span> <span class="s1">'left'</span><span class="p">))</span>
 </span></pre></div>
 </figure></div>
 <p>Running <code>blackbox_inner('A' * 20)</code> yields:</p>
@@ -281,9 +288,9 @@
 <p>Of course the question now is “how is the table being build”. The token “AA” must have been added to the dictionary between outputting the 1<sup>st</sup> and 2<sup>nd</sup> pair.</p>
 <p>Hypothesis: Each time a token is outputted a token consisting of itself and the letter just before it is added to the dictionary.</p>
 <p>This model fits with the data, so I perform a few more tests to confirm or discard the hypothesis:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet9.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s">'ABAB'</span><span class="p">)</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet9.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s1">'ABAB'</span><span class="p">)</span>
 </span><span id="line-2"><span class="lineno">2 </span>  <span class="p">[</span><span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-</span><span id="line-3"><span class="lineno">3 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s">'ABABBAB'</span><span class="p">)</span>
+</span><span id="line-3"><span class="lineno">3 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s1">'ABABBAB'</span><span class="p">)</span>
 </span><span id="line-4"><span class="lineno">4 </span>  <span class="p">[</span><span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">254</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 </span></pre></div>
 </figure></div>
@@ -291,13 +298,13 @@
 <p>Revised hypothesis: Each time a token is outputted a token consisting of the previous token and the first letter of the token being outputted is added to the dictionary.</p>
 <p>Note that this model fits both the A-tests and the two tests above.</p>
 <p>Testing:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet10.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s">'ABABXABX'</span><span class="p">)</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet10.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s1">'ABABXABX'</span><span class="p">)</span>
 </span><span id="line-2"><span class="lineno">2 </span>  <span class="p">[</span><span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">253</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 </span></pre></div>
 </figure></div>
 <p>Yep, “ABX” (<em>=</em> “AB” + “X”) was in the dictionary.</p>
 <p>Why is the reference 253? Because “BA” was added between the 2<sup>nd</sup> and 3<sup>rd</sup> pair:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet11.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s">'ABABXABXBA'</span><span class="p">)</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet11.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s1">'ABABXABXBA'</span><span class="p">)</span>
 </span><span id="line-2"><span class="lineno">2 </span>  <span class="p">[</span><span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">253</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">254</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 </span></pre></div>
 </figure></div>
@@ -307,14 +314,14 @@
 <li>Is the <em>n</em><sup>th</sup> entry added to the dictionary before or after the <em>n</em><sup>th</sup> pair is generated? That is, can a token reference itself?</li>
 </ol>
 <p>The first one is easy to test:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet12.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">s</span> <span class="o">=</span> <span class="s">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">))</span> <span class="o">+</span> <span class="s">'AAA'</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet12.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">s</span> <span class="o">=</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">))</span> <span class="o">+</span> <span class="s1">'AAA'</span>
 </span><span id="line-2"><span class="lineno">2 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 </span><span id="line-3"><span class="lineno">3 </span>  <span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 </span></pre></div>
 </figure></div>
 <p>Aha, so the second component in the pairs is part of the dictionary index.</p>
 <p>For the second question I design this test:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet13.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s">'ABABABA'</span><span class="p">)</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet13.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">blackbox_inner</span><span class="p">(</span><span class="s1">'ABABABA'</span><span class="p">)</span>
 </span><span id="line-2"><span class="lineno">2 </span>  <span class="p">[</span><span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">253</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 </span></pre></div>
 </figure></div>
@@ -347,7 +354,7 @@
 </span><span id="line-24"><span class="lineno">24 </span><span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
 </span><span id="line-25"><span class="lineno">25 </span>    <span class="n">stream</span> <span class="o">=</span> <span class="p">[</span><span class="mi">207</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">171</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">173</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span>
 </span><span id="line-26"><span class="lineno">26 </span>              <span class="mi">152</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">109</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">186</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-</span><span id="line-27"><span class="lineno">27 </span>    <span class="k">return</span> <span class="s">'0ops'</span> <span class="o">+</span> <span class="n">xor</span><span class="p">(</span><span class="n">compress_inner</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">stream</span><span class="p">,</span> <span class="n">cut</span> <span class="o">=</span> <span class="s">'left'</span><span class="p">)</span>
+</span><span id="line-27"><span class="lineno">27 </span>    <span class="k">return</span> <span class="s1">'0ops'</span> <span class="o">+</span> <span class="n">xor</span><span class="p">(</span><span class="n">compress_inner</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">stream</span><span class="p">,</span> <span class="n">cut</span> <span class="o">=</span> <span class="s1">'left'</span><span class="p">)</span>
 </span></pre></div>
 </figure></div>
 <p>And test it for correctness:</p>
@@ -360,7 +367,7 @@
 <div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet16.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span><span class="k">def</span> <span class="nf">decompress_inner</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
 </span><span id="line-2"><span class="lineno"> 2 </span>    <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="line-3"><span class="lineno"> 3 </span>    <span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>
-</span><span id="line-4"><span class="lineno"> 4 </span>    <span class="n">out</span> <span class="o">=</span> <span class="s">''</span>
+</span><span id="line-4"><span class="lineno"> 4 </span>    <span class="n">out</span> <span class="o">=</span> <span class="s1">''</span>
 </span><span id="line-5"><span class="lineno"> 5 </span>    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">xs</span><span class="p">):</span>
 </span><span id="line-6"><span class="lineno"> 6 </span>        <span class="k">print</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
 </span><span id="line-7"><span class="lineno"> 7 </span>        <span class="k">print</span> <span class="n">d</span>
@@ -383,7 +390,7 @@
 </span><span id="line-24"><span class="lineno">24 </span><span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
 </span><span id="line-25"><span class="lineno">25 </span>    <span class="n">stream</span> <span class="o">=</span> <span class="p">[</span><span class="mi">207</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">171</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">173</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span>
 </span><span id="line-26"><span class="lineno">26 </span>              <span class="mi">152</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">109</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">186</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-</span><span id="line-27"><span class="lineno">27 </span>    <span class="k">return</span> <span class="n">decompress_inner</span><span class="p">(</span><span class="n">ordlist</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">4</span><span class="p">:],</span> <span class="n">stream</span><span class="p">,</span> <span class="n">cut</span> <span class="o">=</span> <span class="s">'left'</span><span class="p">)))</span>
+</span><span id="line-27"><span class="lineno">27 </span>    <span class="k">return</span> <span class="n">decompress_inner</span><span class="p">(</span><span class="n">ordlist</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">4</span><span class="p">:],</span> <span class="n">stream</span><span class="p">,</span> <span class="n">cut</span> <span class="o">=</span> <span class="s1">'left'</span><span class="p">)))</span>
 </span></pre></div>
 </figure></div>
 <p>Of course I test it too:</p>
@@ -393,7 +400,7 @@
 </span></pre></div>
 </figure></div>
 <p>And the final step:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet18.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">write</span><span class="p">(</span><span class="s">'slimming_inner'</span><span class="p">,</span> <span class="n">decompress</span><span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="s">'slimming_data'</span><span class="p">)))</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="./posts/0ctf/slimming/snippet18.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span><span class="n">write</span><span class="p">(</span><span class="s1">'slimming_inner'</span><span class="p">,</span> <span class="n">decompress</span><span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="s1">'slimming_data'</span><span class="p">)))</span>
 </span></pre></div>
 </figure></div>
 <p>The result, <a href="./posts/0ctf/slimming/slimming_inner" class="uri">slimming_inner</a>, is an extremely small 32bit ELF. It is the simplest crackme you have ever seen:</p>
@@ -462,7 +469,7 @@
 <br />
 
 <center>
-  (<a href="./posts/0ctf/slimming">To top</a>)
+  (<a id="link-to-top" href="./posts/0ctf/slimming">To top</a>)
 </center>
 
 <br />

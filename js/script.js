@@ -1,3 +1,96 @@
-function copy_to_clipboard(a){for(;!a.classList.contains("codeblock");)a=a.parentElement;var c=$("<textarea>");$("body").append(c);a=$("pre",a).clone().find(".lineno").remove().end().text();c.val(a).select();document.execCommand("copy");c.remove()}
-$(document).ready(function(){var a=$("#navbar"),c=$("#navbar-placeholder"),d=$(window);d.bind("scroll resize",function(){var e=d.scrollTop(),b=c.offset().top;e>b&&!a.hasClass("fixed")?(c.height(c.height()),a.addClass("fixed")):e<=b&&a.hasClass("fixed")&&(c.css("height","auto"),a.removeClass("fixed"))});var f=$("#search-link"),b=$("form.search");f.click(function(){b.is(":visible")?b.fadeOut("fast"):(b.fadeIn("fast"),b.find("input").focus())});b.submit(function(){i=b.find("#input");q=b.find("#query");
-q.val("site:br0ns.dk "+i.val())});$("figure.codeblock:not(.no-copynpaste) .buttons-container").prepend('<a onclick="copy_to_clipboard(this);" title="Copy to clipboard"><i class="fa fa-clipboard"></a>');hs.dimmingOpacity=0.75;hs.dimmingDuration=0;hs.expandCursor=null;$("img").load(function(){var a=this;$("<img/>").attr("src",a.src).load(function(){this.width>a.width&&(a.onclick=function(){hs.expand(a,{src:a.src})})})})});
+function copy_to_clipboard(element) {
+    // Assume the link is embedded in the codeblock
+    while (! element.classList.contains("codeblock")) {
+        element = element.parentElement;
+    }
+
+    var temp = $("<textarea>");
+    $("body").append(temp);
+    // Remove line numbers
+    var code = $("pre", element)
+        .clone()
+        .find(".lineno")
+        .remove()
+        .end()
+        .text();
+    temp.val(code).select();
+    try {
+        document.execCommand("copy");
+    }
+    finally {
+        temp.remove();
+    }
+}
+
+$(document).ready(function(){
+
+    // Make navigation bar sticky
+    // based on http://www.bennadel.com/blog/1810-creating-a-sometimes-fixed-\
+    //                                       position-element-with-jquery.htm
+    var navbar = $("#navbar");
+    var placeholder = $("#navbar-placeholder");
+    // Cache jQuery-enriched window object
+    var view = $(window);
+
+    view.bind("scroll resize", function () {
+        var scroll = view.scrollTop();
+        var offset = placeholder.offset().top;
+        if (scroll > offset && ! navbar.hasClass("fixed")) {
+            placeholder.height(placeholder.height());
+            navbar.addClass("fixed");
+        } else if (scroll <= offset && navbar.hasClass("fixed")) {
+            placeholder.css("height", "auto");
+            navbar.removeClass("fixed");
+        }
+    });
+
+
+    // Make search button work
+    var link = $('#search-link');
+    var form = $('form.search');
+    // Toggle search field visibility
+    link.click(function () {
+        if (form.is(':visible')) {
+            form.fadeOut('fast');
+        } else {
+            form.fadeIn('fast');
+            form.find('input').focus();
+        }
+    });
+    // Use Google for searching
+    form.submit(function () {
+        i = form.find('#input');
+        q = form.find('#query');
+        q.val('site:br0ns.dk ' + i.val());
+    });
+
+    // Add copy'n'paste link to code blocks
+    $("figure.codeblock:not(.no-copynpaste) .buttons-container").prepend(
+        '<a onclick="copy_to_clipboard(this);" title="Copy to clipboard"><i class="fa fa-clipboard"></a>'
+    );
+
+    // Zoom scaled images when clicking
+    hs.dimmingOpacity = 0.75;
+    hs.dimmingDuration = 0;
+    hs.expandCursor = null;
+    $("img").load(function () {
+        var img = this;
+        $("<img/>")
+            .attr("src", img.src)
+            .load(function () {
+                if (this.width > img.width) {
+                    img.onclick = function () {
+                        hs.expand(img, {src: img.src});
+                    };
+                }
+            });
+    });
+
+    // Let "To top" link scroll the page instead of reloading
+    $("#link-to-top")
+        .click(function (e) {
+            e.preventDefault();
+            window.scroll(0, 0);
+        });
+
+});
