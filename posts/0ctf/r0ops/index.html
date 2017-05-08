@@ -146,7 +146,7 @@
 <p>First off the program accepts a network connection and reads up to 0x1000 bytes to a global buffer. Then it copies 0x1000 random looking bytes from one global buffer to another. I have no idea what this step is for; an attempt at obfuscation maybe?</p>
 <p>Lastly <code>rdi</code> is loaded with the address of the received data, <code>rsi</code> with the address of an uninitialized global buffer, and <code>rsp</code> with an address in the middle of the random looking bytes. Upon return from the program will then of course jump to the first address stored here.</p>
 <p>As it turns out that address contains a jump to a short code sequence which ends in a <code>ret</code>, which of course means that the program jumps to the next address in the “stack”:</p>
-<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet0" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">1 </span>0x0dead1f4: jmp     2 ;; 0x0dead1f8
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet0" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno">1 </span>0x0dead1f4: jmp     2 ;; 0x0dead1f8
 </span><span id="line-2"><span class="lineno">2 </span>0x0dead1f6: or      esi, esi ;; probably just for alignment
 </span><span id="line-3"><span class="lineno">3 </span>0x0dead1f8: pop     rcx
 </span><span id="line-4"><span class="lineno">4 </span>0x0dead1f8: retn
@@ -154,7 +154,7 @@
 </figure></div>
 <p>Looking at a few more gadgets on the “stack” I see the pattern that they all start with a short jump and end with a return.</p>
 <p>So I write an <a href="../../../posts/0ctf/r0ops/decode.py">IDA script</a> to extract the “real” program:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/decode.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span><span class="kn">from</span> <span class="nn">idaapi</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/decode.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno"> 1 </span><span class="kn">from</span> <span class="nn">idaapi</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="line-2"><span class="lineno"> 2 </span><span class="kn">from</span> <span class="nn">idautils</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="line-3"><span class="lineno"> 3 </span><span class="kn">from</span> <span class="nn">idc</span> <span class="kn">import</span> <span class="o">*</span>
 </span><span id="line-4"><span class="lineno"> 4 </span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
@@ -196,7 +196,7 @@
 </span></pre></div>
 </figure></div>
 <p>And run it:</p>
-<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet2" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">  1 </span>$ idaq64 -Sdecode.py -B r0ops 42&gt;&amp;1
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet2" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno">  1 </span>$ idaq64 -Sdecode.py -B r0ops 42&gt;&amp;1
 </span><span id="line-2"><span class="lineno">  2 </span>0x0e0b08a0 -&gt; 0x0dead1f8: pop     rcx ;; = 0x8
 </span><span id="line-3"><span class="lineno">  3 </span>0x0e0b08b0 -&gt; 0x0dead275: pop     r9 ;; = 0x1337deadbeef0095
 </span><span id="line-4"><span class="lineno">  4 </span>0x0e0b08c0 -&gt; 0x0dead127: mov     rax, [rdi]
@@ -375,7 +375,7 @@
 <li><p>The last two gadgets are huge; they are probably “real” functions. The second one (the pointer at 0x0e0bc90) is just back in the <code>accept</code>-loop, so the first one (pointer at 0x0ebc88) is probably a win-function.</p></li>
 </ol>
 <p>First I group the program by which instructions I guess belong to the same higher-level language operation:</p>
-<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet3" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno">  1 </span>    pop     rcx ;; = 0x8
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet3" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno">  1 </span>    pop     rcx ;; = 0x8
 </span><span id="line-2"><span class="lineno">  2 </span>    pop     r9  ;; = 0x1337deadbeef0095
 </span><span id="line-3"><span class="lineno">  3 </span>
 </span><span id="line-4"><span class="lineno">  4 </span>    mov     rax, [rdi]
@@ -543,7 +543,7 @@
 <li><code>rcx</code> is set to 8 in the beginning and then only modified by the <code>loop</code> instruction.</li>
 </ul>
 <p>Rewriting register assignment, jumps and inserting labels gives:</p>
-<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet4" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span>    rcx &lt;- 8
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet4" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno"> 1 </span>    rcx &lt;- 8
 </span><span id="line-2"><span class="lineno"> 2 </span>    r9  &lt;- 0x1337deadbeef0095
 </span><span id="line-3"><span class="lineno"> 3 </span>START:
 </span><span id="line-4"><span class="lineno"> 4 </span>    rax &lt;- get_next_input_qword
@@ -611,7 +611,7 @@
 </figure></div>
 <p>Aha, <code>rax</code> and <code>rbx</code> are only used as temporary variables (notice that the compiler completely breaks character in the right-shift operation where 1 is used directly rather than being loaded into <code>rbx</code>).</p>
 <p>Getting rid of <code>rax</code> and <code>rbx</code>:</p>
-<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet5" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span>    rcx &lt;- 8
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet5" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno"> 1 </span>    rcx &lt;- 8
 </span><span id="line-2"><span class="lineno"> 2 </span>    r9  &lt;- 0x1337deadbeef0095
 </span><span id="line-3"><span class="lineno"> 3 </span>START:
 </span><span id="line-4"><span class="lineno"> 4 </span>    r8  &lt;- get_next_input_qword
@@ -646,7 +646,7 @@
 </span></pre></div>
 </figure></div>
 <p>One final rewrite (even though I’m sure you have it figured out):</p>
-<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet6" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span>r9  &lt;- 0x1337deadbeef0095
+<div class="codeblock-container"><figure class="codeblock"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet6" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno"> 1 </span>r9  &lt;- 0x1337deadbeef0095
 </span><span id="line-2"><span class="lineno"> 2 </span>run 8 times {
 </span><span id="line-3"><span class="lineno"> 3 </span>  r8  &lt;- get_next_input_qword
 </span><span id="line-4"><span class="lineno"> 4 </span>  r9  &lt;- r9 * 0xcafe + 0xbeef
@@ -677,7 +677,7 @@
 <p>Because register values wrap around, computation effectively happens modulo <span class="math inline">\(2^{64}\)</span>.</p>
 <p>By <a href="http://en.wikipedia.org/wiki/Euler%27s_theorem">Euler’s theorem</a> we have that <span class="math inline">\(a^{\phi(n)} \equiv 1 \mod n\)</span>, so if we can find <span class="math inline">\(d \equiv 13337^{-1} \mod \phi(n)\)</span> we will have <span class="math inline">\(x_{i}^{d} = (y_{i}^{13337})^d = y_{i}^{13337 \cdot d} = y_{i}^1 = y_i\)</span>.</p>
 <p>Every odd number is relatively prime to <span class="math inline">\(2^{64}\)</span> so <span class="math inline">\(\phi(2^{64})\)</span> is <span class="math inline">\(2^{63}\)</span>. And here’s the program:</p>
-<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet7.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span id="line-1"><span class="lineno"> 1 </span><span class="kn">import</span> <span class="nn">gmpy</span>
+<div class="codeblock-container"><figure class="codeblock python"><div class="buttons-container"><a href="../../../posts/0ctf/r0ops/snippet7.py" class="download-link" title="Download snippet"><i class="fa fa-download"></i></a></div><div class="highlight"><pre><span></span><span id="line-1"><span class="lineno"> 1 </span><span class="kn">import</span> <span class="nn">gmpy</span>
 </span><span id="line-2"><span class="lineno"> 2 </span>
 </span><span id="line-3"><span class="lineno"> 3 </span><span class="n">N</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">64</span>
 </span><span id="line-4"><span class="lineno"> 4 </span>

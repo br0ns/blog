@@ -27,9 +27,8 @@ while True:
         line += '0x%08x: %s' % (addr, GetDisasm(addr))
         if   mnem == 'retn':
             break
-        # show jump targets as addresses
         elif mnem == 'pop':
-            line += ' ;; = 0x%x' % Qword(rsp)
+            line += ' ;; %d' % Qword(rsp)
             rsp += 8
         addr += size
         program.append(line)
