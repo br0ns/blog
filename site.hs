@@ -94,7 +94,8 @@ main = do
     tags <- buildTags postsPattern (fromCapture "tags/*" . canonName)
 
     -- Copy everything as a "raw" version
-    match (postsDir .||. "pages/**" .||. "static/**") $
+    match ((postsDir .||. "pages/**" .||. "static/**") .&&.
+           complement "**.md") $
       version "raw" $ do
         route   baseRoute
         compile copyFileCompiler
