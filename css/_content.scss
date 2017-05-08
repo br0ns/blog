@@ -110,10 +110,10 @@
     }
 
     code {
-        /* border: 1px solid #aaa; */
-        background: $color-code-background;
-        padding: 2px 5px;
-        border-radius: 5px;
+        color: $color-inline-code;
+//        background: $color-code-background;
+//        padding: 2px 5px;
+//        border-radius: 5px;
     }
 
     blockquote {
@@ -224,7 +224,9 @@
             font-size: 80%;
             padding-top: 0.2em;
             vertical-align: bottom;
-            left: -18pt;
+            left: -30pt;
+            text-align: right;
+            width: 30pt;
             color: #bbb;
 
             -webkit-user-select: none; /* Chrome/Safari */
